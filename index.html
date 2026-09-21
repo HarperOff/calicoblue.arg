@@ -18,6 +18,7 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
+            position: relative;
         }
 
         .container {
@@ -30,6 +31,7 @@
             box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
             max-width: 450px;
             width: 90%;
+            z-index: 2; /* Por encima de los corazones */
         }
 
         h1 {
@@ -127,6 +129,7 @@
         }
 
         .error { color: #f87171; }
+        .success { color: #60a5fa; }
 
         /* Mensaje final y Contador */
         .discord-instruction {
@@ -163,6 +166,7 @@
             align-items: center;
             width: 100vw;
             height: 100vh;
+            z-index: 3;
         }
 
         #sansContainer img {
@@ -185,9 +189,48 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
         }
+
+        /* Corazones flotantes de fondo */
+        #heartsContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .blue-heart {
+            position: absolute;
+            bottom: -50px;
+            color: #3b82f6;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px #2563eb, 0 0 20px #60a5fa;
+            opacity: 0.8;
+            animation: floatUp 6s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(0.8) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-110vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+
+<!-- Contenedor para los corazones flotantes -->
+<div id="heartsContainer"></div>
 
 <!-- Pantalla de Sans (Sombra Secreta) -->
 <div id="sansContainer">
@@ -235,6 +278,11 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
+    // Comprobar si la función del código azul está activa en la sesión
+    if (localStorage.getItem('arg_blue_hearts') === 'true') {
+        activarCorazonesAzules();
+    }
+
     // Elementos DOM
     const codeForm = document.getElementById('codeForm');
     const input = document.getElementById('userInput');
@@ -258,6 +306,16 @@
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
+
+        // Activación del código "azul"
+        if (value === 'azul') {
+            localStorage.setItem('arg_blue_hearts', 'true');
+            activarCorazonesAzules();
+            msg.className = 'response-msg success';
+            msg.textContent = '💙';
+            input.value = '';
+            return;
+        }
 
         if (stage === 1) {
             if (value === 'alfa') {
@@ -315,6 +373,27 @@
         finalMessage.style.display = 'block';
         triggerFlash(finalMessage);
         start24HourTimer();
+    }
+
+    // Lógica de Corazones Azules Flotantes
+    function activarCorazonesAzules() {
+        const heartsContainer = document.getElementById('heartsContainer');
+        if (heartsContainer.childElementCount > 0) return; // Evitar duplicar intervalos
+
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('blue-heart');
+            heart.innerHTML = '💙';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's'; // Entre 4s y 7s
+            heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+            
+            heartsContainer.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 7000);
+        }, 400);
     }
 
     // Lógica del Temporizador en Tiempo Real (24 Horas)
