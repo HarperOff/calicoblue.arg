@@ -34,6 +34,35 @@
             z-index: 2; /* Por encima de los corazones */
         }
 
+        /* Botón de Recargar Página como Ícono en la esquina */
+        .reload-icon-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: 1px solid #1e3a8a;
+            color: #93c5fd;
+            font-size: 1.1rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            box-shadow: 0 0 8px rgba(30, 144, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .reload-icon-btn:hover {
+            background-color: #1e293b;
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+            transform: rotate(180deg);
+        }
+
         h1 {
             color: #3b82f6;
             font-size: 1.4rem;
@@ -141,26 +170,6 @@
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
         }
 
-        /* Botón de Recargar Página */
-        .reload-btn {
-            background-color: #0f172a;
-            border: 1px solid #1e3a8a;
-            color: #93c5fd;
-            font-size: 0.75rem;
-            padding: 6px 14px;
-            margin-top: 25px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .reload-btn:hover {
-            background-color: #1e293b;
-            border-color: #3b82f6;
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-
         .response-msg {
             margin-top: 20px;
             font-size: 0.95rem;
@@ -206,12 +215,19 @@
             width: 100vw;
             height: 100vh;
             z-index: 3;
+            position: relative;
         }
 
         #sansContainer img {
             max-width: 220px;
             height: auto;
             image-rendering: pixelated;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        #sansContainer img:active {
+            transform: scale(0.95);
         }
 
         .sans-text {
@@ -222,6 +238,36 @@
             text-align: center;
             letter-spacing: 1px;
             animation: floatText 2s ease-in-out infinite;
+        }
+
+        /* Burbuja de Texto de Undertale para Sans */
+        .speech-bubble {
+            display: none;
+            position: absolute;
+            top: 20%;
+            background: #ffffff;
+            color: #000000;
+            border: 4px solid #000000;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.75rem;
+            max-width: 280px;
+            line-height: 1.6;
+            text-align: left;
+            box-shadow: 0 0 0 4px #ffffff, 0 0 15px rgba(255, 255, 255, 0.5);
+            z-index: 10;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: #000000 transparent transparent transparent;
         }
 
         @keyframes floatText {
@@ -273,12 +319,16 @@
 
 <!-- Pantalla de Sans (Sombra Secreta) -->
 <div id="sansContainer">
-    <img src="sans.png" alt="sans">
+    <div id="sansBubble" class="speech-bubble">¿Cuál es tu versión favorita de mi?</div>
+    <img id="sansSprite" src="sans.png" alt="sans">
     <div class="sans-text">¿Que estás buscando?</div>
 </div>
 
 <!-- Contenedor Principal del Juego -->
 <div class="container" id="mainContainer">
+    <!-- Botón de recarga simplificado (Símbolo en la esquina superior derecha) -->
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
+
     <h1>[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
 
     <!-- Formulario de Códigos / Preguntas -->
@@ -298,11 +348,6 @@
 
     <div id="responseMsg" class="response-msg"></div>
 
-    <!-- Botón para recargar la página -->
-    <div>
-        <button type="button" class="reload-btn" onclick="location.reload();">[ 🔄 RECARGAR PÁGINA ]</button>
-    </div>
-
     <!-- Pista casi invisible -->
     <div class="secret-hint">¿has pensado en recargar la pagina?</div>
 </div>
@@ -320,6 +365,16 @@
         localStorage.setItem('arg_reload_count', '0');
     } else {
         localStorage.setItem('arg_reload_count', reloadCount);
+    }
+
+    // Interacción al hacer clic/tocar a Sans
+    const sansSprite = document.getElementById('sansSprite');
+    const sansBubble = document.getElementById('sansBubble');
+
+    if (sansSprite) {
+        sansSprite.addEventListener('click', function() {
+            sansBubble.style.display = 'block';
+        });
     }
 
     // Elementos DOM
