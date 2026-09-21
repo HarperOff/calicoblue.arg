@@ -7,14 +7,13 @@
     <!-- Fuente Pixelada de Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* Deshabilitar resaltado/cuadro azul de selección en elementos cliqueables */
+        /* Desactivar resaltado azul y selección de texto global */
         * {
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-        }
-
-        input[type="text"] {
-            user-select: text; /* Permitir seleccionar/escribir en el input */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* Estilos Góticos con detalles Azul Neón */
@@ -41,7 +40,7 @@
             box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
             max-width: 450px;
             width: 90%;
-            z-index: 2; /* Por encima de las animaciones de fondo */
+            z-index: 2; /* Por encima de los corazones */
         }
 
         /* Botón de Recargar Página como Ícono en la esquina */
@@ -154,6 +153,8 @@
             outline: none;
             box-shadow: inset 0 0 5px rgba(37, 99, 235, 0.5);
             transition: all 0.3s ease;
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         input[type="text"]:focus {
@@ -172,9 +173,9 @@
             cursor: pointer;
             border-radius: 4px;
             letter-spacing: 1px;
-            outline: none;
             box-shadow: 0 0 10px rgba(30, 64, 175, 0.5);
             transition: background-color 0.3s, transform 0.1s;
+            outline: none;
         }
 
         button:hover {
@@ -214,7 +215,6 @@
             right: 12px;
             font-size: 0.65rem;
             color: rgba(147, 197, 253, 0.08);
-            user-select: none;
             pointer-events: none;
         }
 
@@ -236,7 +236,6 @@
             image-rendering: pixelated;
             cursor: pointer;
             transition: transform 0.1s ease;
-            outline: none;
         }
 
         #sansContainer img:active {
@@ -324,53 +323,40 @@
             }
         }
 
-        /* Lluvia rápida del nombre "Noelle" a los lados */
-        .noelle-column {
+        /* Efecto Krisselle (Lluvia Infinita de Noelle) */
+        #noelleContainer {
+            display: none;
             position: absolute;
             top: 0;
-            bottom: 0;
-            width: 18%;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             pointer-events: none;
             z-index: 1;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8rem;
+            color: #a7f3d0;
+            text-shadow: 0 0 8px #34d399, 0 0 15px #059669;
+            opacity: 0.85;
+        }
+
+        .noelle-column {
+            position: absolute;
+            top: 0;
             display: flex;
             flex-direction: column;
-        }
-
-        .noelle-left {
-            left: 5px;
-        }
-
-        .noelle-right {
-            right: 5px;
-        }
-
-        .noelle-text {
-            position: absolute;
-            bottom: -40px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.85rem;
-            color: #93c5fd;
-            text-shadow: 0 0 8px #3b82f6, 0 0 15px #60a5fa;
             white-space: nowrap;
-            opacity: 0.9;
-            animation: riseFast 1.8s linear infinite;
+            line-height: 2.2;
+            animation: scrollUpNoelle 1.2s linear infinite;
         }
 
-        @keyframes riseFast {
+        @keyframes scrollUpNoelle {
             0% {
                 transform: translateY(0);
-                opacity: 0.2;
-            }
-            20% {
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
             }
             100% {
-                transform: translateY(-110vh);
-                opacity: 0;
+                transform: translateY(-50%);
             }
         }
     </style>
@@ -380,9 +366,8 @@
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
 
-<!-- Columnas laterales para el efecto de "Noelle" -->
-<div id="noelleLeft" class="noelle-column noelle-left"></div>
-<div id="noelleRight" class="noelle-column noelle-right"></div>
+<!-- Contenedor para el efecto Krisselle / Noelle -->
+<div id="noelleContainer"></div>
 
 <!-- Pantalla de Sans (Sombra Secreta) -->
 <div id="sansContainer">
@@ -393,7 +378,7 @@
 
 <!-- Contenedor Principal del Juego -->
 <div class="container" id="mainContainer">
-    <!-- Botón de recarga simplificado (Símbolo en la esquina superior derecha) -->
+    <!-- Botón de recarga simplificado -->
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
 
     <h1>[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
@@ -453,9 +438,8 @@
     const finalMessage = document.getElementById('finalMessage');
     const timerDisplay = document.getElementById('timer');
 
-    // Variables para controlar las animaciones activas
+    // Variables de intervalos de efectos de fondo
     let heartsInterval = null;
-    let noelleInterval = null;
 
     // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki")
     let stage = 1;
@@ -474,6 +458,7 @@
 
         // Activación del código "azul"
         if (value === 'azul') {
+            desactivarEfectoNoelle();
             activarCorazonesAzules();
             msg.className = 'response-msg success';
             msg.textContent = '💙';
@@ -483,9 +468,10 @@
 
         // Activación del código "krisselle"
         if (value === 'krisselle') {
+            desactivarCorazonesAzules();
             activarEfectoNoelle();
             msg.className = 'response-msg success';
-            msg.textContent = '❄️ Noelle...';
+            msg.textContent = '❄️';
             input.value = '';
             return;
         }
@@ -570,36 +556,43 @@
         }, 400);
     }
 
-    // Lógica del código "Krisselle" (Lluvia rápida de "Noelle" a los lados)
+    function desactivarCorazonesAzules() {
+        if (heartsInterval !== null) {
+            clearInterval(heartsInterval);
+            heartsInterval = null;
+        }
+        document.getElementById('heartsContainer').innerHTML = '';
+    }
+
+    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle subiendo rápido)
     function activarEfectoNoelle() {
-        if (noelleInterval !== null) return;
+        const noelleContainer = document.getElementById('noelleContainer');
+        noelleContainer.innerHTML = '';
+        noelleContainer.style.display = 'block';
 
-        const leftCol = document.getElementById('noelleLeft');
-        const rightCol = document.getElementById('noelleRight');
+        const columnCount = Math.floor(window.innerWidth / 90) + 2;
 
-        noelleInterval = setInterval(() => {
-            // Crear elementos para la izquierda
-            const elemLeft = document.createElement('div');
-            elemLeft.classList.add('noelle-text');
-            elemLeft.textContent = 'Noelle';
-            elemLeft.style.left = Math.random() * 60 + '%';
-            elemLeft.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+        for (let i = 0; i < columnCount; i++) {
+            const col = document.createElement('div');
+            col.classList.add('noelle-column');
+            col.style.left = (i * 90) + 'px';
+            col.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's';
 
-            // Crear elementos para la derecha
-            const elemRight = document.createElement('div');
-            elemRight.classList.add('noelle-text');
-            elemRight.textContent = 'Noelle';
-            elemRight.style.left = Math.random() * 60 + '%';
-            elemRight.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+            // Generar repetición continua del nombre Noelle
+            let textBlock = '';
+            for (let j = 0; j < 35; j++) {
+                textBlock += 'Noelle<br>';
+            }
+            col.innerHTML = textBlock + textBlock; // Duplicar bloque para scroll continuo sin saltos
 
-            leftCol.appendChild(elemLeft);
-            rightCol.appendChild(elemRight);
+            noelleContainer.appendChild(col);
+        }
+    }
 
-            setTimeout(() => {
-                elemLeft.remove();
-                elemRight.remove();
-            }, 2000);
-        }, 150);
+    function desactivarEfectoNoelle() {
+        const noelleContainer = document.getElementById('noelleContainer');
+        noelleContainer.style.display = 'none';
+        noelleContainer.innerHTML = '';
     }
 
     // Lógica del Temporizador en Tiempo Real (24 Horas)
@@ -611,7 +604,7 @@
             localStorage.setItem('arg_timer_start', startTime);
         }
 
-        const duration = 24 * 60 * 60 * 1000;
+        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
 
         function updateTimer() {
             const now = Date.now();
@@ -633,4 +626,13 @@
             const sStr = String(seconds).padStart(2, '0');
 
             timerDisplay.textContent = `${hStr}:${mStr}:${sStr}`;
- 
+        }
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+    }
+</script>
+
+</body>
+</html>
+
