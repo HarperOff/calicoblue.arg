@@ -628,4 +628,108 @@
     function mostrarInstruccionDiscord() {
         codeForm.style.display = 'none';
         msg.textContent = '';
-        finalMessa
+        finalMessage.style.display = 'block';
+        triggerFlash(finalMessage);
+        start24HourTimer();
+    }
+
+    // Lógica de Corazones Azules Flotantes
+    function activarCorazonesAzules() {
+        if (heartsInterval !== null) return;
+
+        const heartsContainer = document.getElementById('heartsContainer');
+
+        heartsInterval = setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('blue-heart');
+            heart.innerHTML = '💙';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+            
+            heartsContainer.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 7000);
+        }, 400);
+    }
+
+    function desactivarCorazonesAzules() {
+        if (heartsInterval !== null) {
+            clearInterval(heartsInterval);
+            heartsInterval = null;
+        }
+        document.getElementById('heartsContainer').innerHTML = '';
+    }
+
+    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle subiendo rápido)
+    function activarEfectoNoelle() {
+        const noelleContainer = document.getElementById('noelleContainer');
+        noelleContainer.innerHTML = '';
+        noelleContainer.style.display = 'block';
+
+        const columnCount = Math.floor(window.innerWidth / 90) + 2;
+
+        for (let i = 0; i < columnCount; i++) {
+            const col = document.createElement('div');
+            col.classList.add('noelle-column');
+            col.style.left = (i * 90) + 'px';
+            col.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's';
+
+            let textBlock = '';
+            for (let j = 0; j < 35; j++) {
+                textBlock += 'Noelle<br>';
+            }
+            col.innerHTML = textBlock + textBlock;
+
+            noelleContainer.appendChild(col);
+        }
+    }
+
+    function desactivarEfectoNoelle() {
+        const noelleContainer = document.getElementById('noelleContainer');
+        noelleContainer.style.display = 'none';
+        noelleContainer.innerHTML = '';
+    }
+
+    // Lógica del Temporizador en Tiempo Real (24 Horas)
+    function start24HourTimer() {
+        let startTime = localStorage.getItem('arg_timer_start');
+        
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem('arg_timer_start', startTime);
+        }
+
+        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+
+        function updateTimer() {
+            const now = Date.now();
+            const elapsed = now - parseInt(startTime, 10);
+            const remaining = duration - elapsed;
+
+            if (remaining <= 0) {
+                timerDisplay.textContent = "00:00:00";
+                clearInterval(interval);
+                return;
+            }
+
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+            const hStr = String(hours).padStart(2, '0');
+            const mStr = String(minutes).padStart(2, '0');
+            const sStr = String(seconds).padStart(2, '0');
+
+            timerDisplay.textContent = `${hStr}:${mStr}:${sStr}`;
+        }
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+    }
+</script>
+
+</body>
+</html>
