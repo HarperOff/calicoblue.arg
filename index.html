@@ -230,7 +230,7 @@
         .error { color: #f87171; }
         .success { color: #60a5fa; }
 
-        /* Mensaje "¿Por qué?" y Corazón Progresivo */
+        /* Mensaje "¿Por qué?" y Corazón Muy Lento */
         .why-response-box {
             display: none;
             margin-top: 20px;
@@ -246,7 +246,7 @@
             color: #60a5fa;
             font-weight: bold;
             opacity: 0;
-            transition: opacity 3.5s ease-in-out;
+            transition: opacity 8s ease-in-out; /* Aparición muy lenta de 8 segundos */
             text-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa;
         }
 
@@ -573,7 +573,7 @@
     // Normalizar texto para verificar respuestas de "¿Por qué?" y sus variantes
     function isWhyVariant(text) {
         const clean = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!]/g, "").trim();
-        return clean === 'por que' || clean === 'porque' || clean === 'por que' || clean === 'porque';
+        return clean === 'por que' || clean === 'porque';
     }
 
     // Lógica de Validación de Respuestas
@@ -588,7 +588,7 @@
             slowHeart.classList.remove('show');
             setTimeout(() => {
                 slowHeart.classList.add('show');
-            }, 800);
+            }, 1500); // 1.5 segundos de retraso antes de comenzar a desvanecerse muy lentamente
             input.value = '';
             msg.textContent = '';
             return;
@@ -634,9 +634,9 @@
                 input.value = '';
                 msg.textContent = '';
             } else if (value === 'porcelana') {
-                irAFaseRoberto();
+                irAFaseVideoRoberto();
             } else if (value === 'roberto') {
-                irAFaseRoberto();
+                irAFasePreguntaRoberto();
             } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
@@ -644,18 +644,24 @@
             }
         } else if (stage === 2) {
             if (value === 'porcelana') {
-                irAFaseRoberto();
+                irAFaseVideoRoberto();
             } else if (value === 'roberto') {
-                irAFaseRoberto();
+                irAFasePreguntaRoberto();
             } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
                 mostrarError();
             }
-        } else if (stage === 3) {
+        } else if (stage === 'video_roberto') {
             if (value === 'roberto') {
-                irAFaseRoberto();
+                irAFasePreguntaRoberto();
             } else if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
+            }
+        } else if (stage === 'pregunta_roberto') {
+            if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
                 mostrarError();
@@ -669,19 +675,34 @@
         }
     });
 
-    function irAFaseRoberto() {
-        stage = 3;
+    // Fase al ingresar "porcelana": Muestra únicamente el vídeo musical
+    function irAFaseVideoRoberto() {
+        stage = 'video_roberto';
         robertoImg.style.display = 'none';
         killerImg.style.display = 'none';
         killerQuoteText.style.display = 'none';
         killerQuestionText.style.display = 'none';
         
-        // Muestra el reproductor del video de Roberto
         robertoVideoBox.style.display = 'block';
-        promptText.style.display = 'block';
-        promptText.textContent = '# Ingresa el código Roberto';
-        triggerFlash(promptText);
+        promptText.style.display = 'none'; // Se oculta cualquier indicación de texto
         triggerFlash(robertoVideoBox);
+        input.value = '';
+        msg.textContent = '';
+    }
+
+    // Fase al ingresar "roberto": Muestra la foto roberto.png y la pregunta "¿Sabes quien es?"
+    function irAFasePreguntaRoberto() {
+        stage = 'pregunta_roberto';
+        robertoVideoBox.style.display = 'none';
+        killerImg.style.display = 'none';
+        killerQuoteText.style.display = 'none';
+        killerQuestionText.style.display = 'none';
+
+        robertoImg.style.display = 'inline-block';
+        promptText.style.display = 'block';
+        promptText.textContent = '¿Sabes quien es?';
+        triggerFlash(promptText);
+        triggerFlash(robertoImg);
         input.value = '';
         msg.textContent = '';
     }
