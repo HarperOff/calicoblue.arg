@@ -41,6 +41,23 @@
             max-width: 450px;
             width: 90%;
             z-index: 2; /* Por encima de los corazones */
+            transition: all 0.5s ease;
+        }
+
+        /* Estilo para la nueva pantalla Swap Sans (Placeholder con brillo azul) */
+        .swap-glow {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), inset 0 0 25px rgba(96, 165, 250, 0.3) !important;
+            animation: swapPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes swapPulse {
+            0% {
+                box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), inset 0 0 20px rgba(96, 165, 250, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 55px rgba(96, 165, 250, 0.8), inset 0 0 35px rgba(59, 130, 246, 0.5);
+            }
         }
 
         /* Botón de Recargar Página como Ícono en la esquina */
@@ -107,24 +124,31 @@
             line-height: 1.5;
         }
 
-        /* Estilo para las imágenes de Pistas */
+        /* Textos especiales para la fase Killer */
+        .red-dialogue {
+            color: #f87171;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+        }
+
+        .blue-question {
+            color: #60a5fa;
+            font-size: 1.1rem;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
+            margin-bottom: 25px;
+        }
+
+        /* Estilo para las imágenes de pistas */
         .clue-image {
             max-width: 100%;
             height: auto;
-            max-height: 220px;
+            max-height: 200px;
             border: 1px solid #2563eb;
             border-radius: 6px;
             margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
-        }
-
-        /* Texto personalizado para Killer Sans (Rojo) */
-        .killer-dialogue {
-            color: #f87171;
-            font-weight: bold;
-            font-size: 1rem;
-            text-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
-            margin-bottom: 15px;
         }
 
         /* Animación de destello para los textos al cambiar */
@@ -364,16 +388,6 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(-50%); }
         }
-
-        /* Placeholder para la respuesta Swap (Brillo Azul tenue) */
-        #swapPlaceholder {
-            display: none;
-            color: #93c5fd;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            text-shadow: 0 0 15px #3b82f6, 0 0 30px #60a5fa;
-            padding: 20px;
-        }
     </style>
 </head>
 <body>
@@ -396,27 +410,31 @@
     <!-- Botón de recarga simplificado -->
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
 
-    <h1>[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
+    <h1 id="mainTitle">[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
 
     <!-- Formulario de Códigos / Preguntas -->
     <form id="codeForm">
-        <img id="clueImg" src="" alt="Pista Visual" class="clue-image" style="display: none;">
-        <div id="killerSubtitle" class="killer-dialogue" style="display: none;">Killer: Soy el Tumblr sexy man!</div>
+        <img id="robertoImg" src="roberto.png" alt="Pista Roberto" class="clue-image" style="display: none;">
+        <img id="killerImg" src="killer.png" alt="Pista Killer Sans" class="clue-image" style="display: none;">
+        
+        <div id="killerDialogue" class="red-dialogue" style="display: none;">Killer: Soy el Tumblr sexy man!</div>
         <p id="promptText"># Ingresa el código</p>
+        
         <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
         <br>
         <button type="submit">INGRESAR</button>
     </form>
 
-    <!-- Contenedor del Mensaje Final con Contador (Post-Kiki) -->
+    <!-- Contenedor del Mensaje Final con Contador -->
     <div id="finalMessage" class="discord-instruction" style="display: none;">
         <p>Envíame una foto del primer dibujo que te di por Discord.</p>
         <div id="timer">24:00:00</div>
     </div>
 
-    <!-- Contenedor Placeholder para Swap Sans -->
-    <div id="swapPlaceholder" style="display: none;">
-        [ SECUENCIA_SWAP_ACTIVADA ]
+    <!-- Contenedor Placeholder Swap Sans -->
+    <div id="swapPage" class="discord-instruction" style="display: none;">
+        <p style="font-size: 1.3rem; color: #60a5fa; text-shadow: 0 0 15px #3b82f6;">[ FASE: SWAP_SANS ]</p>
+        <p style="font-size: 0.95rem; color: #d1e8ff;">Próximamente...</p>
     </div>
 
     <div id="responseMsg" class="response-msg"></div>
@@ -451,20 +469,22 @@
     }
 
     // Elementos DOM
+    const mainContainer = document.getElementById('mainContainer');
     const codeForm = document.getElementById('codeForm');
     const input = document.getElementById('userInput');
     const msg = document.getElementById('responseMsg');
     const promptText = document.getElementById('promptText');
-    const clueImg = document.getElementById('clueImg');
-    const killerSubtitle = document.getElementById('killerSubtitle');
+    const robertoImg = document.getElementById('robertoImg');
+    const killerImg = document.getElementById('killerImg');
+    const killerDialogue = document.getElementById('killerDialogue');
     const finalMessage = document.getElementById('finalMessage');
-    const swapPlaceholder = document.getElementById('swapPlaceholder');
+    const swapPage = document.getElementById('swapPage');
     const timerDisplay = document.getElementById('timer');
 
     // Variables de intervalos de efectos de fondo
     let heartsInterval = null;
 
-    // Estado del juego
+    // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki", 5: "killer", 6: "swap")
     let stage = 1;
 
     // Función auxiliar para aplicar la animación de destello
@@ -499,18 +519,6 @@
             return;
         }
 
-        // Activación o respuesta para "Killer"
-        if (value === 'killer' || value === 'killer sans') {
-            irAFaseKiller();
-            return;
-        }
-
-        // Respuesta "Swap" / "Swap sans" desde la fase de Killer
-        if (stage === 'killer' && (value === 'swap' || value === 'swap sans')) {
-            irAPlaceholderSwap();
-            return;
-        }
-
         if (stage === 1) {
             if (value === 'alfa') {
                 stage = 2;
@@ -524,6 +532,10 @@
                 irAFaseRoberto();
             } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
+            } else if (value === 'killer' || value === 'killer sans') {
+                irAFaseKiller();
+            } else if (value === 'swap' || value === 'swap sans') {
+                irAFaseSwap();
             } else {
                 mostrarError();
             }
@@ -534,50 +546,70 @@
                 irAFaseRoberto();
             } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
+            } else if (value === 'killer' || value === 'killer sans') {
+                irAFaseKiller();
+            } else if (value === 'swap' || value === 'swap sans') {
+                irAFaseSwap();
             } else {
                 mostrarError();
             }
         } else if (stage === 3) {
             if (value === 'kiki') {
                 mostrarInstruccionDiscord();
+            } else if (value === 'killer' || value === 'killer sans') {
+                irAFaseKiller();
+            } else if (value === 'swap' || value === 'swap sans') {
+                irAFaseSwap();
             } else {
                 mostrarError();
             }
-        } else {
-            mostrarError();
+        } else if (stage === 5) {
+            if (value === 'swap' || value === 'swap sans') {
+                irAFaseSwap();
+            } else {
+                mostrarError();
+            }
         }
     });
 
     function irAFaseRoberto() {
         stage = 3;
-        killerSubtitle.style.display = 'none';
-        clueImg.src = 'roberto.png';
-        clueImg.style.display = 'inline-block';
+        killerImg.style.display = 'none';
+        killerDialogue.style.display = 'none';
+        promptText.className = '';
+        
+        robertoImg.style.display = 'inline-block';
         promptText.textContent = '¿Sabes quien es?';
         triggerFlash(promptText);
-        triggerFlash(clueImg);
+        triggerFlash(robertoImg);
         input.value = '';
         msg.textContent = '';
     }
 
     function irAFaseKiller() {
-        stage = 'killer';
-        clueImg.src = 'killer.png';
-        clueImg.style.display = 'inline-block';
-        killerSubtitle.style.display = 'block';
+        stage = 5;
+        robertoImg.style.display = 'none';
+        
+        killerImg.style.display = 'inline-block';
+        killerDialogue.style.display = 'block';
         promptText.textContent = '# ¿Que sans soy para ti?';
+        promptText.className = 'blue-question';
+        
+        triggerFlash(killerDialogue);
         triggerFlash(promptText);
-        triggerFlash(killerSubtitle);
-        triggerFlash(clueImg);
+        triggerFlash(killerImg);
         input.value = '';
         msg.textContent = '';
     }
 
-    function irAPlaceholderSwap() {
+    function irAFaseSwap() {
+        stage = 6;
         codeForm.style.display = 'none';
         msg.textContent = '';
-        swapPlaceholder.style.display = 'block';
-        triggerFlash(swapPlaceholder);
+        
+        mainContainer.classList.add('swap-glow');
+        swapPage.style.display = 'block';
+        triggerFlash(swapPage);
     }
 
     function mostrarError() {
@@ -588,51 +620,4 @@
     function mostrarInstruccionDiscord() {
         codeForm.style.display = 'none';
         msg.textContent = '';
-        finalMessage.style.display = 'block';
-        triggerFlash(finalMessage);
-        start24HourTimer();
-    }
-
-    // Lógica de Corazones Azules Flotantes
-    function activarCorazonesAzules() {
-        if (heartsInterval !== null) return;
-
-        const heartsContainer = document.getElementById('heartsContainer');
-
-        heartsInterval = setInterval(() => {
-            const heart = document.createElement('div');
-            heart.classList.add('blue-heart');
-            heart.innerHTML = '💙';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-            heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
-            
-            heartsContainer.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 7000);
-        }, 400);
-    }
-
-    function desactivarCorazonesAzules() {
-        if (heartsInterval !== null) {
-            clearInterval(heartsInterval);
-            heartsInterval = null;
-        }
-        document.getElementById('heartsContainer').innerHTML = '';
-    }
-
-    // Lógica del Efecto "Krisselle"
-    function activarEfectoNoelle() {
-        const noelleContainer = document.getElementById('noelleContainer');
-        noelleContainer.innerHTML = '';
-        noelleContainer.style.display = 'block';
-
-        const columnCount = Math.floor(window.innerWidth / 90) + 2;
-
-        for (let i = 0; i < columnCount; i++) {
-            const col = document.createElement('div');
-            col.classList.add('noelle-column');
-            col.style.left = (i * 90) + 'px';
-            col.
+        finalMessage.style.di
