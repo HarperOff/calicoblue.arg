@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/// ARCHIVO_DESCONOCIDO ///</title>
+    <!-- Fuente Pixelada de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Góticos con detalles Azul Neón */
+        body {
+            background-color: #050508;
+            color: #d1e8ff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            background: #0a0d14;
+            padding: 40px;
+            border: 1px solid #1e3a8a;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
+            max-width: 450px;
+            width: 90%;
+        }
+
+        h1 {
+            color: #3b82f6;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+            margin-bottom: 25px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #93c5fd;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        input[type="text"] {
+            background-color: #030712;
+            border: 1px solid #2563eb;
+            color: #60a5fa;
+            padding: 12px 15px;
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: center;
+            width: 80%;
+            border-radius: 4px;
+            outline: none;
+            box-shadow: inset 0 0 5px rgba(37, 99, 235, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
+        }
+
+        button {
+            margin-top: 20px;
+            background-color: #1e40af;
+            color: #ffffff;
+            border: none;
+            padding: 10px 25px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(30, 64, 175, 0.5);
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
+        }
+
+        .response-msg {
+            margin-top: 20px;
+            font-size: 0.95rem;
+            min-height: 24px;
+        }
+
+        .success { color: #60a5fa; }
+        .error { color: #f87171; }
+
+        /* Pista secreta/oculta */
+        .secret-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.65rem;
+            color: rgba(147, 197, 253, 0.08); /* Muy transparente */
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* Estilo para la pantalla secreta de Sans */
+        #sansContainer {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #sansContainer img {
+            max-width: 220px;
+            height: auto;
+            image-rendering: pixelated;
+        }
+
+        .sans-text {
+            margin-top: 25px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-align: center;
+            letter-spacing: 1px;
+            animation: floatText 2s ease-in-out infinite;
+        }
+
+        /* Animación de leve movimiento */
+        @keyframes floatText {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pantalla de Sans (Sombra Secreta) -->
+<div id="sansContainer">
+    <img src="sans.png" alt="sans">
+    <div class="sans-text">¿Que estás buscando?</div>
+</div>
+
+<!-- Contenedor Principal del Juego -->
+<div class="container" id="mainContainer">
+    <h1>[ PROYECTO: CÁLICO_AZUL ]</h1>
+    <p id="promptText"># Entonces ¿Te gustaría resolver este juego?</p>
+
+    <form id="riddleForm" action="https://formspree.io/f/xppwdwaw" method="POST">
+        <input type="hidden" name="notificacion" value="¡Aceptó iniciar el acertijo!">
+        <!-- Campos invisibles para registrar datos del visitante -->
+        <input type="hidden" id="userAgent" name="dispositivo_navegador" value="">
+        <input type="hidden" id="fechaHora" name="fecha_y_hora" value="">
+        
+        <input type="text" id="userInput" name="respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
+        <br>
+        <button type="submit">INGRESAR</button>
+    </form>
+
+    <div id="responseMsg" class="response-msg"></div>
+
+    <!-- Pista casi invisible -->
+    <div class="secret-hint">¿has pensado en recargar la pagina?</div>
+</div>
+
+<script>
+    // Registro automático de datos del visitante (Navegador y Fecha/Hora)
+    document.getElementById('userAgent').value = navigator.userAgent;
+    document.getElementById('fechaHora').value = new Date().toLocaleString();
+
+    // Lógica del contador de recargas (Easter Egg de Sans a las 5 recargas)
+    let reloadCount = parseInt(localStorage.getItem('arg_reload_count') || '0', 10);
+    reloadCount += 1;
+
+    if (reloadCount === 5) {
+        document.getElementById('mainContainer').style.display = 'none';
+        document.getElementById('sansContainer').style.display = 'flex';
+        localStorage.setItem('arg_reload_count', reloadCount);
+    } else if (reloadCount >= 6) {
+        localStorage.setItem('arg_reload_count', '0');
+    } else {
+        localStorage.setItem('arg_reload_count', reloadCount);
+    }
+
+    // Lógica del Formulario
+    const form = document.getElementById('riddleForm');
+    const input = document.getElementById('userInput');
+    const msg = document.getElementById('responseMsg');
+    const promptText = document.getElementById('promptText');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const value = input.value.trim().toLowerCase();
+
+        if (value === 'si' || value === 'sí') {
+            msg.className = 'response-msg success';
+            msg.textContent = 'Enviando señal...';
+
+            fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'Accept': 'application/json' }
+            }).finally(() => {
+                form.style.display = 'none';
+                promptText.style.display = 'none';
+                msg.className = 'response-msg success';
+                msg.style.fontSize = '1.1rem';
+                msg.style.marginTop = '0';
+                msg.textContent = 'Espera un tiempo y vuelve cuando resuelvas la proxima pregunta (#)';
+            });
+
+        } else if (value === 'no') {
+            msg.className = 'response-msg error';
+            msg.textContent = 'Nah, no acepto esa respuesta ;p';
+        } else {
+            msg.className = 'response-msg error';
+            msg.textContent = 'Codigo equivocado, Alfa ;p';
+        }
+    });
+</script>
+
+</body>
+</html>
