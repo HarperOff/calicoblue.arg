@@ -47,6 +47,28 @@
             line-height: 1.5;
         }
 
+        /* Animación de destello para los textos al cambiar */
+        .flash-effect {
+            animation: textFlash 0.8s ease-out;
+        }
+
+        @keyframes textFlash {
+            0% {
+                color: #ffffff;
+                text-shadow: 0 0 20px #ffffff, 0 0 30px #60a5fa;
+                transform: scale(1.03);
+            }
+            50% {
+                color: #93c5fd;
+                text-shadow: 0 0 15px #3b82f6;
+            }
+            100% {
+                color: #93c5fd;
+                text-shadow: none;
+                transform: scale(1);
+            }
+        }
+
         input[type="text"] {
             background-color: #030712;
             border: 1px solid #2563eb;
@@ -202,6 +224,13 @@
     // Estado del juego (1: "alfa", 2: "porcelana")
     let stage = 1;
 
+    // Función auxiliar para aplicar la animación de destello
+    function triggerFlash(element) {
+        element.classList.remove('flash-effect');
+        void element.offsetWidth; // Forzar reflow para reiniciar la animación CSS
+        element.classList.add('flash-effect');
+    }
+
     // Lógica de Validación de Respuestas
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -211,6 +240,7 @@
             if (value === 'alfa') {
                 stage = 2;
                 promptText.textContent = '¿Quién era nuestro dolor de cabeza?';
+                triggerFlash(promptText);
                 input.value = '';
                 msg.textContent = '';
             } else if (value === 'porcelana') {
@@ -234,6 +264,7 @@
         codeForm.style.display = 'none';
         msg.textContent = '';
         finalMessage.style.display = 'block';
+        triggerFlash(finalMessage);
     }
 </script>
 
