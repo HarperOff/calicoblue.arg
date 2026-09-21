@@ -67,32 +67,6 @@
             box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
         }
 
-        /* Input de tipo archivo personalizado */
-        .file-upload-wrapper {
-            margin-bottom: 15px;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        .file-custom-btn {
-            display: inline-block;
-            background-color: #0f172a;
-            border: 1px dashed #3b82f6;
-            color: #93c5fd;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .file-custom-btn:hover {
-            border-color: #60a5fa;
-            background-color: #1e293b;
-        }
-
         button {
             margin-top: 15px;
             background-color: #1e40af;
@@ -119,8 +93,15 @@
             min-height: 24px;
         }
 
-        .success { color: #60a5fa; }
         .error { color: #f87171; }
+
+        /* Mensaje final al completar las preguntas */
+        .discord-instruction {
+            color: #60a5fa;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+        }
 
         /* Pista secreta/oculta */
         .secret-hint {
@@ -177,7 +158,7 @@
 <div class="container" id="mainContainer">
     <h1>[ PROYECTO: CÁLICO_AZUL ]</h1>
 
-    <!-- FORMULARIO FASE 1 Y FASE 2 (Códigos) -->
+    <!-- Formulario de Códigos / Preguntas -->
     <form id="codeForm">
         <p id="promptText"># Ingresa el código</p>
         <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
@@ -185,22 +166,10 @@
         <button type="submit">INGRESAR</button>
     </form>
 
-    <!-- FORMULARIO FASE 3 (Subida de Foto) -->
-    <form id="photoForm" action="https://formspree.io/f/xppwdwaw" method="POST" enctype="multipart/form-data" style="display: none;">
-        <p>Envíame una foto del primer dibujo que te di</p>
-        
-        <!-- Campos invisibles para registrar datos del visitante -->
-        <input type="hidden" id="userAgent" name="dispositivo_navegador" value="">
-        <input type="hidden" id="fechaHora" name="fecha_y_hora" value="">
-        <input type="hidden" name="fase" value="Foto del primer dibujo subida con exito">
-
-        <div class="file-upload-wrapper">
-            <label for="photoInput" class="file-custom-btn" id="fileLabel">📸 Seleccionar archivo...</label>
-            <input type="file" id="photoInput" name="foto" accept="image/*" required>
-        </div>
-
-        <button type="submit">ENVIAR FOTO</button>
-    </form>
+    <!-- Contenedor del Mensaje Final para Discord -->
+    <div id="finalMessage" class="discord-instruction" style="display: none;">
+        Envíame una foto del primer dibujo que te di por Discord.
+    </div>
 
     <div id="responseMsg" class="response-msg"></div>
 
@@ -209,10 +178,6 @@
 </div>
 
 <script>
-    // Registro automático de datos del visitante
-    document.getElementById('userAgent').value = navigator.userAgent;
-    document.getElementById('fechaHora').value = new Date().toLocaleString();
-
     // Contador de recargas (Easter Egg de Sans a las 5 recargas)
     let reloadCount = parseInt(localStorage.getItem('arg_reload_count') || '0', 10);
     reloadCount += 1;
@@ -229,26 +194,15 @@
 
     // Elementos DOM
     const codeForm = document.getElementById('codeForm');
-    const photoForm = document.getElementById('photoForm');
     const input = document.getElementById('userInput');
-    const photoInput = document.getElementById('photoInput');
-    const fileLabel = document.getElementById('fileLabel');
     const msg = document.getElementById('responseMsg');
     const promptText = document.getElementById('promptText');
+    const finalMessage = document.getElementById('finalMessage');
 
-    // Estado del juego
-    let stage = 1; // 1: Esperando "alfa", 2: Esperando "porcelana"
+    // Estado del juego (1: "alfa", 2: "porcelana")
+    let stage = 1;
 
-    // Cambiar texto de botón de archivo cuando selecciona imagen
-    photoInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            fileLabel.textContent = '📁 ' + this.files[0].name;
-        } else {
-            fileLabel.textContent = '📸 Seleccionar archivo...';
-        }
-    });
-
-    // Lógica del Formulario de Códigos (Fase 1 y 2)
+    // Lógica de Validación de Respuestas
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
@@ -260,15 +214,15 @@
                 input.value = '';
                 msg.textContent = '';
             } else if (value === 'porcelana') {
-                // Atajo directo ingresando "porcelana"
-                irAFase3();
+                // Atajo directo si ingresa "porcelana" de primera
+                mostrarInstruccionDiscord();
             } else {
                 msg.className = 'response-msg error';
                 msg.textContent = 'Codigo equivocado, Alfa ;p';
             }
         } else if (stage === 2) {
             if (value === 'porcelana') {
-                irAFase3();
+                mostrarInstruccionDiscord();
             } else {
                 msg.className = 'response-msg error';
                 msg.textContent = 'Codigo equivocado, Alfa ;p';
@@ -276,42 +230,11 @@
         }
     });
 
-    function irAFase3() {
+    function mostrarInstruccionDiscord() {
         codeForm.style.display = 'none';
-        photoForm.style.display = 'block';
         msg.textContent = '';
+        finalMessage.style.display = 'block';
     }
-
-    // Lógica de Envío de la Foto a Formspree (Fase 3)
-    photoForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        msg.className = 'response-msg success';
-        msg.textContent = 'Subiendo imagen...';
-
-        const formData = new FormData(photoForm);
-
-        fetch(photoForm.action, {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(response => {
-            if (response.ok) {
-                photoForm.style.display = 'none';
-                msg.className = 'response-msg success';
-                msg.style.fontSize = '1.1rem';
-                msg.style.marginTop = '0';
-                msg.textContent = 'Imagen recibida. Espera un tiempo y vuelve cuando resuelvas la proxima pregunta (#)';
-            } else {
-                msg.className = 'response-msg error';
-                msg.textContent = 'Error al subir la imagen. Inténtalo de nuevo.';
-            }
-        })
-        .catch(() => {
-            msg.className = 'response-msg error';
-            msg.textContent = 'Error de conexión. Inténtalo de nuevo.';
-        });
-    });
 </script>
 
 </body>
