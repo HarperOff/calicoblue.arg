@@ -67,8 +67,34 @@
             box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
         }
 
+        /* Input de tipo archivo personalizado */
+        .file-upload-wrapper {
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-custom-btn {
+            display: inline-block;
+            background-color: #0f172a;
+            border: 1px dashed #3b82f6;
+            color: #93c5fd;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-custom-btn:hover {
+            border-color: #60a5fa;
+            background-color: #1e293b;
+        }
+
         button {
-            margin-top: 20px;
+            margin-top: 15px;
             background-color: #1e40af;
             color: #ffffff;
             border: none;
@@ -102,7 +128,7 @@
             bottom: 8px;
             right: 12px;
             font-size: 0.65rem;
-            color: rgba(147, 197, 253, 0.08); /* Muy transparente */
+            color: rgba(147, 197, 253, 0.08);
             user-select: none;
             pointer-events: none;
         }
@@ -133,14 +159,9 @@
             animation: floatText 2s ease-in-out infinite;
         }
 
-        /* Animación de leve movimiento */
         @keyframes floatText {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-6px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
     </style>
 </head>
@@ -155,17 +176,30 @@
 <!-- Contenedor Principal del Juego -->
 <div class="container" id="mainContainer">
     <h1>[ PROYECTO: CÁLICO_AZUL ]</h1>
-    <p id="promptText"># Ingresa el código</p>
 
-    <form id="riddleForm" action="https://formspree.io/f/xppwdwaw" method="POST">
-        <input type="hidden" name="notificacion" value="¡Aceptó iniciar el acertijo!">
+    <!-- FORMULARIO FASE 1 Y FASE 2 (Códigos) -->
+    <form id="codeForm">
+        <p id="promptText"># Ingresa el código</p>
+        <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
+        <br>
+        <button type="submit">INGRESAR</button>
+    </form>
+
+    <!-- FORMULARIO FASE 3 (Subida de Foto) -->
+    <form id="photoForm" action="https://formspree.io/f/xppwdwaw" method="POST" enctype="multipart/form-data" style="display: none;">
+        <p>Envíame una foto del primer dibujo que te di</p>
+        
         <!-- Campos invisibles para registrar datos del visitante -->
         <input type="hidden" id="userAgent" name="dispositivo_navegador" value="">
         <input type="hidden" id="fechaHora" name="fecha_y_hora" value="">
-        
-        <input type="text" id="userInput" name="respuesta" placeholder="Escribe tu respuesta..." autocomplete="off">
-        <br>
-        <button type="submit">INGRESAR</button>
+        <input type="hidden" name="fase" value="Foto del primer dibujo subida con exito">
+
+        <div class="file-upload-wrapper">
+            <label for="photoInput" class="file-custom-btn" id="fileLabel">📸 Seleccionar archivo...</label>
+            <input type="file" id="photoInput" name="foto" accept="image/*" required>
+        </div>
+
+        <button type="submit">ENVIAR FOTO</button>
     </form>
 
     <div id="responseMsg" class="response-msg"></div>
@@ -175,11 +209,11 @@
 </div>
 
 <script>
-    // Registro automático de datos del visitante (Navegador y Fecha/Hora)
+    // Registro automático de datos del visitante
     document.getElementById('userAgent').value = navigator.userAgent;
     document.getElementById('fechaHora').value = new Date().toLocaleString();
 
-    // Lógica del contador de recargas (Easter Egg de Sans a las 5 recargas)
+    // Contador de recargas (Easter Egg de Sans a las 5 recargas)
     let reloadCount = parseInt(localStorage.getItem('arg_reload_count') || '0', 10);
     reloadCount += 1;
 
@@ -193,40 +227,90 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
-    // Lógica del Formulario
-    const form = document.getElementById('riddleForm');
+    // Elementos DOM
+    const codeForm = document.getElementById('codeForm');
+    const photoForm = document.getElementById('photoForm');
     const input = document.getElementById('userInput');
+    const photoInput = document.getElementById('photoInput');
+    const fileLabel = document.getElementById('fileLabel');
     const msg = document.getElementById('responseMsg');
     const promptText = document.getElementById('promptText');
 
-    form.addEventListener('submit', function(e) {
+    // Estado del juego
+    let stage = 1; // 1: Esperando "alfa", 2: Esperando "porcelana"
+
+    // Cambiar texto de botón de archivo cuando selecciona imagen
+    photoInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            fileLabel.textContent = '📁 ' + this.files[0].name;
+        } else {
+            fileLabel.textContent = '📸 Seleccionar archivo...';
+        }
+    });
+
+    // Lógica del Formulario de Códigos (Fase 1 y 2)
+    codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
 
-        if (value === 'si' || value === 'sí') {
-            msg.className = 'response-msg success';
-            msg.textContent = 'Enviando señal...';
+        if (stage === 1) {
+            if (value === 'alfa') {
+                stage = 2;
+                promptText.textContent = '¿Quién era nuestro dolor de cabeza?';
+                input.value = '';
+                msg.textContent = '';
+            } else if (value === 'porcelana') {
+                // Atajo directo ingresando "porcelana"
+                irAFase3();
+            } else {
+                msg.className = 'response-msg error';
+                msg.textContent = 'Codigo equivocado, Alfa ;p';
+            }
+        } else if (stage === 2) {
+            if (value === 'porcelana') {
+                irAFase3();
+            } else {
+                msg.className = 'response-msg error';
+                msg.textContent = 'Codigo equivocado, Alfa ;p';
+            }
+        }
+    });
 
-            fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: { 'Accept': 'application/json' }
-            }).finally(() => {
-                form.style.display = 'none';
-                promptText.style.display = 'none';
+    function irAFase3() {
+        codeForm.style.display = 'none';
+        photoForm.style.display = 'block';
+        msg.textContent = '';
+    }
+
+    // Lógica de Envío de la Foto a Formspree (Fase 3)
+    photoForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        msg.className = 'response-msg success';
+        msg.textContent = 'Subiendo imagen...';
+
+        const formData = new FormData(photoForm);
+
+        fetch(photoForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(response => {
+            if (response.ok) {
+                photoForm.style.display = 'none';
                 msg.className = 'response-msg success';
                 msg.style.fontSize = '1.1rem';
                 msg.style.marginTop = '0';
-                msg.textContent = 'Espera un tiempo y vuelve cuando resuelvas la proxima pregunta (#)';
-            });
-
-        } else if (value === 'no') {
+                msg.textContent = 'Imagen recibida. Espera un tiempo y vuelve cuando resuelvas la proxima pregunta (#)';
+            } else {
+                msg.className = 'response-msg error';
+                msg.textContent = 'Error al subir la imagen. Inténtalo de nuevo.';
+            }
+        })
+        .catch(() => {
             msg.className = 'response-msg error';
-            msg.textContent = 'Nah, no acepto esa respuesta ;p';
-        } else {
-            msg.className = 'response-msg error';
-            msg.textContent = 'Codigo equivocado, Alfa ;p';
-        }
+            msg.textContent = 'Error de conexión. Inténtalo de nuevo.';
+        });
     });
 </script>
 
