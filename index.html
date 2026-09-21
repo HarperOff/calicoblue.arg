@@ -107,7 +107,7 @@
             line-height: 1.5;
         }
 
-        /* Estilo para la imagen de Roberto */
+        /* Estilo para las imágenes de Pistas */
         .clue-image {
             max-width: 100%;
             height: auto;
@@ -116,6 +116,21 @@
             border-radius: 6px;
             margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Textos específicos para la fase de Killer */
+        .killer-quote {
+            color: #f87171;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
+        }
+
+        .killer-question {
+            color: #3b82f6;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
         }
 
         /* Animación de destello para los textos al cambiar */
@@ -359,6 +374,31 @@
                 transform: translateY(-50%);
             }
         }
+
+        /* Nueva Página Placeholder con Brillo Azul para Swap Sans */
+        #swapPage {
+            display: none;
+            position: relative;
+            text-align: center;
+            background: #0a0d14;
+            padding: 50px 30px;
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            box-shadow: 0 0 35px rgba(59, 130, 246, 0.6), inset 0 0 25px rgba(37, 99, 235, 0.3);
+            max-width: 500px;
+            width: 90%;
+            z-index: 5;
+            animation: blueGlowPage 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes blueGlowPage {
+            0% {
+                box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 15px rgba(37, 99, 235, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 45px rgba(96, 165, 250, 0.8), inset 0 0 30px rgba(59, 130, 246, 0.5);
+            }
+        }
     </style>
 </head>
 <body>
@@ -386,7 +426,12 @@
     <!-- Formulario de Códigos / Preguntas -->
     <form id="codeForm">
         <img id="robertoImg" src="roberto.png" alt="Pista Roberto" class="clue-image" style="display: none;">
+        <img id="killerImg" src="killer.png" alt="Killer Sans" class="clue-image" style="display: none;">
+        
         <p id="promptText"># Ingresa el código</p>
+        <p id="killerQuoteText" class="killer-quote" style="display: none;">Killer: Soy el Tumblr sexy man!</p>
+        <p id="killerQuestionText" class="killer-question" style="display: none;"># ¿Que sans soy para ti?</p>
+
         <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
         <br>
         <button type="submit">INGRESAR</button>
@@ -402,6 +447,13 @@
 
     <!-- Pista casi invisible -->
     <div class="secret-hint">¿has pensado en recargar la pagina?</div>
+</div>
+
+<!-- Nueva Página Placeholder para Swap Sans -->
+<div id="swapPage">
+    <h1 style="color: #60a5fa; margin-bottom: 20px;">[ SECCIÓN: SWAP_SANS ]</h1>
+    <p style="color: #93c5fd; line-height: 1.6;">Página en construcción con brillo azul...</p>
+    <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
 <script>
@@ -435,13 +487,18 @@
     const msg = document.getElementById('responseMsg');
     const promptText = document.getElementById('promptText');
     const robertoImg = document.getElementById('robertoImg');
+    const killerImg = document.getElementById('killerImg');
+    const killerQuoteText = document.getElementById('killerQuoteText');
+    const killerQuestionText = document.getElementById('killerQuestionText');
     const finalMessage = document.getElementById('finalMessage');
     const timerDisplay = document.getElementById('timer');
+    const mainContainer = document.getElementById('mainContainer');
+    const swapPage = document.getElementById('swapPage');
 
     // Variables de intervalos de efectos de fondo
     let heartsInterval = null;
 
-    // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki")
+    // Estado del juego
     let stage = 1;
 
     // Función auxiliar para aplicar la animación de destello
@@ -473,6 +530,18 @@
             msg.className = 'response-msg success';
             msg.textContent = '❄️';
             input.value = '';
+            return;
+        }
+
+        // Activación directa de "killer" o "killer sans"
+        if (value === 'killer' || value === 'killer sans') {
+            irAFaseKiller();
+            return;
+        }
+
+        // Activación directa de "swap" o "swap sans"
+        if (value === 'swap' || value === 'swap sans') {
+            irAPaginaSwap();
             return;
         }
 
@@ -508,17 +577,47 @@
             } else {
                 mostrarError();
             }
+        } else if (stage === 'killer') {
+            if (value === 'swap' || value === 'swap sans') {
+                irAPaginaSwap();
+            } else {
+                mostrarError();
+            }
         }
     });
 
     function irAFaseRoberto() {
         stage = 3;
         robertoImg.style.display = 'inline-block';
+        killerImg.style.display = 'none';
+        killerQuoteText.style.display = 'none';
+        killerQuestionText.style.display = 'none';
+        promptText.style.display = 'block';
         promptText.textContent = '¿Sabes quien es?';
         triggerFlash(promptText);
         triggerFlash(robertoImg);
         input.value = '';
         msg.textContent = '';
+    }
+
+    function irAFaseKiller() {
+        stage = 'killer';
+        robertoImg.style.display = 'none';
+        promptText.style.display = 'none';
+        killerImg.style.display = 'inline-block';
+        killerQuoteText.style.display = 'block';
+        killerQuestionText.style.display = 'block';
+        triggerFlash(killerImg);
+        triggerFlash(killerQuoteText);
+        triggerFlash(killerQuestionText);
+        input.value = '';
+        msg.textContent = '';
+    }
+
+    function irAPaginaSwap() {
+        mainContainer.style.display = 'none';
+        swapPage.style.display = 'block';
+        triggerFlash(swapPage);
     }
 
     function mostrarError() {
@@ -529,109 +628,4 @@
     function mostrarInstruccionDiscord() {
         codeForm.style.display = 'none';
         msg.textContent = '';
-        finalMessage.style.display = 'block';
-        triggerFlash(finalMessage);
-        start24HourTimer();
-    }
-
-    // Lógica de Corazones Azules Flotantes
-    function activarCorazonesAzules() {
-        if (heartsInterval !== null) return;
-
-        const heartsContainer = document.getElementById('heartsContainer');
-
-        heartsInterval = setInterval(() => {
-            const heart = document.createElement('div');
-            heart.classList.add('blue-heart');
-            heart.innerHTML = '💙';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-            heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
-            
-            heartsContainer.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 7000);
-        }, 400);
-    }
-
-    function desactivarCorazonesAzules() {
-        if (heartsInterval !== null) {
-            clearInterval(heartsInterval);
-            heartsInterval = null;
-        }
-        document.getElementById('heartsContainer').innerHTML = '';
-    }
-
-    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle subiendo rápido)
-    function activarEfectoNoelle() {
-        const noelleContainer = document.getElementById('noelleContainer');
-        noelleContainer.innerHTML = '';
-        noelleContainer.style.display = 'block';
-
-        const columnCount = Math.floor(window.innerWidth / 90) + 2;
-
-        for (let i = 0; i < columnCount; i++) {
-            const col = document.createElement('div');
-            col.classList.add('noelle-column');
-            col.style.left = (i * 90) + 'px';
-            col.style.animationDuration = (Math.random() * 0.5 + 0.8) + 's';
-
-            // Generar repetición continua del nombre Noelle
-            let textBlock = '';
-            for (let j = 0; j < 35; j++) {
-                textBlock += 'Noelle<br>';
-            }
-            col.innerHTML = textBlock + textBlock; // Duplicar bloque para scroll continuo sin saltos
-
-            noelleContainer.appendChild(col);
-        }
-    }
-
-    function desactivarEfectoNoelle() {
-        const noelleContainer = document.getElementById('noelleContainer');
-        noelleContainer.style.display = 'none';
-        noelleContainer.innerHTML = '';
-    }
-
-    // Lógica del Temporizador en Tiempo Real (24 Horas)
-    function start24HourTimer() {
-        let startTime = localStorage.getItem('arg_timer_start');
-        
-        if (!startTime) {
-            startTime = Date.now();
-            localStorage.setItem('arg_timer_start', startTime);
-        }
-
-        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-
-        function updateTimer() {
-            const now = Date.now();
-            const elapsed = now - parseInt(startTime, 10);
-            const remaining = duration - elapsed;
-
-            if (remaining <= 0) {
-                timerDisplay.textContent = "00:00:00";
-                clearInterval(interval);
-                return;
-            }
-
-            const hours = Math.floor(remaining / (1000 * 60 * 60));
-            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-
-            const hStr = String(hours).padStart(2, '0');
-            const mStr = String(minutes).padStart(2, '0');
-            const sStr = String(seconds).padStart(2, '0');
-
-            timerDisplay.textContent = `${hStr}:${mStr}:${sStr}`;
-        }
-
-        updateTimer();
-        const interval = setInterval(updateTimer, 1000);
-    }
-</script>
-
-</body>
-</html>
+        finalMessa
