@@ -111,7 +111,7 @@
         .clue-image {
             max-width: 100%;
             height: auto;
-            max-height: 200px;
+            max-height: 220px;
             border: 1px solid #2563eb;
             border-radius: 6px;
             margin-bottom: 20px;
@@ -338,7 +338,7 @@
             }
         }
 
-        /* Efecto Krisselle (Lluvia Infinita de Noelle) */
+        /* Efecto Krisselle (Lluvia Infinita de Noelle en ROJO) */
         #noelleContainer {
             display: none;
             position: absolute;
@@ -351,8 +351,8 @@
             z-index: 1;
             font-family: 'Press Start 2P', monospace;
             font-size: 0.8rem;
-            color: #a7f3d0;
-            text-shadow: 0 0 8px #34d399, 0 0 15px #059669;
+            color: #f87171; /* Rojo brillante */
+            text-shadow: 0 0 8px #ef4444, 0 0 15px #dc2626; /* Sombras neón rojas */
             opacity: 0.85;
         }
 
@@ -375,17 +375,17 @@
             }
         }
 
-        /* Nueva Página Placeholder con Brillo Azul para Swap Sans */
+        /* Página de Swap Sans con Brillo Azul */
         #swapPage {
             display: none;
             position: relative;
             text-align: center;
             background: #0a0d14;
-            padding: 50px 30px;
+            padding: 40px 25px;
             border: 2px solid #3b82f6;
             border-radius: 12px;
             box-shadow: 0 0 35px rgba(59, 130, 246, 0.6), inset 0 0 25px rgba(37, 99, 235, 0.3);
-            max-width: 500px;
+            max-width: 450px;
             width: 90%;
             z-index: 5;
             animation: blueGlowPage 3s ease-in-out infinite alternate;
@@ -449,10 +449,12 @@
     <div class="secret-hint">¿has pensado en recargar la pagina?</div>
 </div>
 
-<!-- Nueva Página Placeholder para Swap Sans -->
+<!-- Página para Swap Sans -->
 <div id="swapPage">
-    <h1 style="color: #60a5fa; margin-bottom: 20px;">[ SECCIÓN: SWAP_SANS ]</h1>
-    <p style="color: #93c5fd; line-height: 1.6;">Página en construcción con brillo azul...</p>
+    <img src="swap.png" alt="Swap y Killer Sans" class="clue-image">
+    <p style="color: #60a5fa; font-size: 1.1rem; line-height: 1.6; text-shadow: 0 0 10px rgba(96, 165, 250, 0.6); margin-bottom: 25px;">
+        Así es! Arriba el KillSwap!
+    </p>
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
@@ -527,8 +529,8 @@
         if (value === 'krisselle') {
             desactivarCorazonesAzules();
             activarEfectoNoelle();
-            msg.className = 'response-msg success';
-            msg.textContent = '❄️';
+            msg.className = 'response-msg error';
+            msg.textContent = '🔴';
             input.value = '';
             return;
         }
@@ -663,7 +665,7 @@
         document.getElementById('heartsContainer').innerHTML = '';
     }
 
-    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle subiendo rápido)
+    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle en ROJO)
     function activarEfectoNoelle() {
         const noelleContainer = document.getElementById('noelleContainer');
         noelleContainer.innerHTML = '';
