@@ -7,6 +7,16 @@
     <!-- Fuente Pixelada de Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
+        /* Deshabilitar resaltado/cuadro azul de selección en elementos cliqueables */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        input[type="text"] {
+            user-select: text; /* Permitir seleccionar/escribir en el input */
+        }
+
         /* Estilos Góticos con detalles Azul Neón */
         body {
             background-color: #050508;
@@ -31,7 +41,7 @@
             box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
             max-width: 450px;
             width: 90%;
-            z-index: 2; /* Por encima de los corazones */
+            z-index: 2; /* Por encima de las animaciones de fondo */
         }
 
         /* Botón de Recargar Página como Ícono en la esquina */
@@ -51,6 +61,7 @@
             justify-content: center;
             align-items: center;
             padding: 0;
+            outline: none;
             box-shadow: 0 0 8px rgba(30, 144, 255, 0.2);
             transition: all 0.3s ease;
         }
@@ -161,6 +172,7 @@
             cursor: pointer;
             border-radius: 4px;
             letter-spacing: 1px;
+            outline: none;
             box-shadow: 0 0 10px rgba(30, 64, 175, 0.5);
             transition: background-color 0.3s, transform 0.1s;
         }
@@ -224,6 +236,7 @@
             image-rendering: pixelated;
             cursor: pointer;
             transition: transform 0.1s ease;
+            outline: none;
         }
 
         #sansContainer img:active {
@@ -310,12 +323,66 @@
                 opacity: 0;
             }
         }
+
+        /* Lluvia rápida del nombre "Noelle" a los lados */
+        .noelle-column {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 18%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .noelle-left {
+            left: 5px;
+        }
+
+        .noelle-right {
+            right: 5px;
+        }
+
+        .noelle-text {
+            position: absolute;
+            bottom: -40px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.85rem;
+            color: #93c5fd;
+            text-shadow: 0 0 8px #3b82f6, 0 0 15px #60a5fa;
+            white-space: nowrap;
+            opacity: 0.9;
+            animation: riseFast 1.8s linear infinite;
+        }
+
+        @keyframes riseFast {
+            0% {
+                transform: translateY(0);
+                opacity: 0.2;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-110vh);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
 
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
+
+<!-- Columnas laterales para el efecto de "Noelle" -->
+<div id="noelleLeft" class="noelle-column noelle-left"></div>
+<div id="noelleRight" class="noelle-column noelle-right"></div>
 
 <!-- Pantalla de Sans (Sombra Secreta) -->
 <div id="sansContainer">
@@ -386,8 +453,9 @@
     const finalMessage = document.getElementById('finalMessage');
     const timerDisplay = document.getElementById('timer');
 
-    // Variable para controlar la generación de corazones
+    // Variables para controlar las animaciones activas
     let heartsInterval = null;
+    let noelleInterval = null;
 
     // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki")
     let stage = 1;
@@ -404,11 +472,20 @@
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
 
-        // Activación del código "azul" (Solo durante esta sesión activa)
+        // Activación del código "azul"
         if (value === 'azul') {
             activarCorazonesAzules();
             msg.className = 'response-msg success';
             msg.textContent = '💙';
+            input.value = '';
+            return;
+        }
+
+        // Activación del código "krisselle"
+        if (value === 'krisselle') {
+            activarEfectoNoelle();
+            msg.className = 'response-msg success';
+            msg.textContent = '❄️ Noelle...';
             input.value = '';
             return;
         }
@@ -471,9 +548,9 @@
         start24HourTimer();
     }
 
-    // Lógica de Corazones Azules Flotantes (desaparecen al recargar)
+    // Lógica de Corazones Azules Flotantes
     function activarCorazonesAzules() {
-        if (heartsInterval !== null) return; // Evitar duplicar intervalos
+        if (heartsInterval !== null) return;
 
         const heartsContainer = document.getElementById('heartsContainer');
 
@@ -493,6 +570,38 @@
         }, 400);
     }
 
+    // Lógica del código "Krisselle" (Lluvia rápida de "Noelle" a los lados)
+    function activarEfectoNoelle() {
+        if (noelleInterval !== null) return;
+
+        const leftCol = document.getElementById('noelleLeft');
+        const rightCol = document.getElementById('noelleRight');
+
+        noelleInterval = setInterval(() => {
+            // Crear elementos para la izquierda
+            const elemLeft = document.createElement('div');
+            elemLeft.classList.add('noelle-text');
+            elemLeft.textContent = 'Noelle';
+            elemLeft.style.left = Math.random() * 60 + '%';
+            elemLeft.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+
+            // Crear elementos para la derecha
+            const elemRight = document.createElement('div');
+            elemRight.classList.add('noelle-text');
+            elemRight.textContent = 'Noelle';
+            elemRight.style.left = Math.random() * 60 + '%';
+            elemRight.style.animationDuration = (Math.random() * 0.8 + 1.2) + 's';
+
+            leftCol.appendChild(elemLeft);
+            rightCol.appendChild(elemRight);
+
+            setTimeout(() => {
+                elemLeft.remove();
+                elemRight.remove();
+            }, 2000);
+        }, 150);
+    }
+
     // Lógica del Temporizador en Tiempo Real (24 Horas)
     function start24HourTimer() {
         let startTime = localStorage.getItem('arg_timer_start');
@@ -502,7 +611,7 @@
             localStorage.setItem('arg_timer_start', startTime);
         }
 
-        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        const duration = 24 * 60 * 60 * 1000;
 
         function updateTimer() {
             const now = Date.now();
@@ -524,12 +633,4 @@
             const sStr = String(seconds).padStart(2, '0');
 
             timerDisplay.textContent = `${hStr}:${mStr}:${sStr}`;
-        }
-
-        updateTimer();
-        const interval = setInterval(updateTimer, 1000);
-    }
-</script>
-
-</body>
-</html>
+ 
