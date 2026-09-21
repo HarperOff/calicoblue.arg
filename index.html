@@ -42,6 +42,25 @@
             margin-bottom: 25px;
         }
 
+        /* Palabra AZUL destacada en el título */
+        .highlight-blue {
+            color: #60a5fa;
+            font-weight: bold;
+            text-shadow: 0 0 12px #3b82f6, 0 0 22px #60a5fa, 0 0 35px #2563eb;
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                text-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa;
+                color: #60a5fa;
+            }
+            100% {
+                text-shadow: 0 0 18px #60a5fa, 0 0 30px #93c5fd, 0 0 45px #2563eb;
+                color: #93c5fd;
+            }
+        }
+
         p {
             font-size: 1.1rem;
             color: #93c5fd;
@@ -120,6 +139,26 @@
         button:hover {
             background-color: #2563eb;
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.8);
+        }
+
+        /* Botón de Recargar Página */
+        .reload-btn {
+            background-color: #0f172a;
+            border: 1px solid #1e3a8a;
+            color: #93c5fd;
+            font-size: 0.75rem;
+            padding: 6px 14px;
+            margin-top: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reload-btn:hover {
+            background-color: #1e293b;
+            border-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
 
         .response-msg {
@@ -240,7 +279,7 @@
 
 <!-- Contenedor Principal del Juego -->
 <div class="container" id="mainContainer">
-    <h1>[ PROYECTO: CÁLICO_AZUL ]</h1>
+    <h1>[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
 
     <!-- Formulario de Códigos / Preguntas -->
     <form id="codeForm">
@@ -258,6 +297,11 @@
     </div>
 
     <div id="responseMsg" class="response-msg"></div>
+
+    <!-- Botón para recargar la página -->
+    <div>
+        <button type="button" class="reload-btn" onclick="location.reload();">[ 🔄 RECARGAR PÁGINA ]</button>
+    </div>
 
     <!-- Pista casi invisible -->
     <div class="secret-hint">¿has pensado en recargar la pagina?</div>
@@ -278,11 +322,6 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
-    // Comprobar si la función del código azul está activa en la sesión
-    if (localStorage.getItem('arg_blue_hearts') === 'true') {
-        activarCorazonesAzules();
-    }
-
     // Elementos DOM
     const codeForm = document.getElementById('codeForm');
     const input = document.getElementById('userInput');
@@ -291,6 +330,9 @@
     const robertoImg = document.getElementById('robertoImg');
     const finalMessage = document.getElementById('finalMessage');
     const timerDisplay = document.getElementById('timer');
+
+    // Variable para controlar la generación de corazones
+    let heartsInterval = null;
 
     // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki")
     let stage = 1;
@@ -307,9 +349,8 @@
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
 
-        // Activación del código "azul"
+        // Activación del código "azul" (Solo durante esta sesión activa)
         if (value === 'azul') {
-            localStorage.setItem('arg_blue_hearts', 'true');
             activarCorazonesAzules();
             msg.className = 'response-msg success';
             msg.textContent = '💙';
@@ -375,17 +416,18 @@
         start24HourTimer();
     }
 
-    // Lógica de Corazones Azules Flotantes
+    // Lógica de Corazones Azules Flotantes (desaparecen al recargar)
     function activarCorazonesAzules() {
-        const heartsContainer = document.getElementById('heartsContainer');
-        if (heartsContainer.childElementCount > 0) return; // Evitar duplicar intervalos
+        if (heartsInterval !== null) return; // Evitar duplicar intervalos
 
-        setInterval(() => {
+        const heartsContainer = document.getElementById('heartsContainer');
+
+        heartsInterval = setInterval(() => {
             const heart = document.createElement('div');
             heart.classList.add('blue-heart');
             heart.innerHTML = '💙';
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = (Math.random() * 3 + 4) + 's'; // Entre 4s y 7s
+            heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
             heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
             
             heartsContainer.appendChild(heart);
