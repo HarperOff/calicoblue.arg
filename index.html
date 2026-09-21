@@ -34,13 +34,15 @@
             position: relative;
             text-align: center;
             background: #0a0d14;
-            padding: 40px;
+            padding: 30px 25px;
             border: 1px solid #1e3a8a;
             border-radius: 8px;
             box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
-            max-width: 450px;
+            max-width: 460px;
             width: 90%;
             z-index: 2; /* Por encima de los corazones */
+            max-height: 92vh;
+            overflow-y: auto;
         }
 
         /* Botón de Recargar Página como Ícono en la esquina */
@@ -75,10 +77,10 @@
 
         h1 {
             color: #3b82f6;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             letter-spacing: 2px;
             text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         /* Palabra AZUL destacada en el título */
@@ -101,9 +103,9 @@
         }
 
         p {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #93c5fd;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             line-height: 1.5;
         }
 
@@ -111,25 +113,46 @@
         .clue-image {
             max-width: 100%;
             height: auto;
-            max-height: 220px;
+            max-height: 200px;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Reproductor de Video Embebido */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            height: 0;
+            overflow: hidden;
             border: 1px solid #2563eb;
             border-radius: 6px;
             margin-bottom: 20px;
             box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
         }
 
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
         /* Textos específicos para la fase de Killer */
         .killer-quote {
             color: #f87171;
-            font-size: 1rem;
-            margin-bottom: 12px;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
             text-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
         }
 
         .killer-question {
             color: #3b82f6;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            margin-bottom: 15px;
             text-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
         }
 
@@ -206,6 +229,30 @@
 
         .error { color: #f87171; }
         .success { color: #60a5fa; }
+
+        /* Mensaje "¿Por qué?" y Corazón Progresivo */
+        .why-response-box {
+            display: none;
+            margin-top: 20px;
+            color: #93c5fd;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(147, 197, 253, 0.4);
+        }
+
+        .slow-heart {
+            display: inline-block;
+            margin-left: 6px;
+            color: #60a5fa;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 3.5s ease-in-out;
+            text-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa;
+        }
+
+        .slow-heart.show {
+            opacity: 1;
+        }
 
         /* Mensaje final y Contador */
         .discord-instruction {
@@ -351,8 +398,8 @@
             z-index: 1;
             font-family: 'Press Start 2P', monospace;
             font-size: 0.8rem;
-            color: #f87171; /* Rojo brillante */
-            text-shadow: 0 0 8px #ef4444, 0 0 15px #dc2626; /* Sombras neón rojas */
+            color: #f87171;
+            text-shadow: 0 0 8px #ef4444, 0 0 15px #dc2626;
             opacity: 0.85;
         }
 
@@ -428,6 +475,11 @@
         <img id="robertoImg" src="roberto.png" alt="Pista Roberto" class="clue-image" style="display: none;">
         <img id="killerImg" src="killer.png" alt="Killer Sans" class="clue-image" style="display: none;">
         
+        <!-- Video Musical de Roberto (Cuarteto de Nos) -->
+        <div id="robertoVideoBox" class="video-container" style="display: none;">
+            <iframe src="https://www.youtube.com/embed/uUy0577epHo" title="CUARTETO DE NOS | ROBERTO" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
         <p id="promptText"># Ingresa el código</p>
         <p id="killerQuoteText" class="killer-quote" style="display: none;">Killer: Soy el Tumblr sexy man!</p>
         <p id="killerQuestionText" class="killer-question" style="display: none;"># ¿Que sans soy para ti?</p>
@@ -437,9 +489,14 @@
         <button type="submit">INGRESAR</button>
     </form>
 
+    <!-- Contenedor para la respuesta de "¿Por qué?" -->
+    <div id="whyResponseBox" class="why-response-box">
+        Todo esto tiene una razón, lo sabrás cuando llegues al final <span id="slowHeart" class="slow-heart">&lt;3</span>
+    </div>
+
     <!-- Contenedor del Mensaje Final con Contador -->
     <div id="finalMessage" class="discord-instruction" style="display: none;">
-        <p>Envíame una foto del primer dibujo que te di por Discord.</p>
+        <p>Has alcanzado la fase final.</p>
         <div id="timer">24:00:00</div>
     </div>
 
@@ -490,8 +547,11 @@
     const promptText = document.getElementById('promptText');
     const robertoImg = document.getElementById('robertoImg');
     const killerImg = document.getElementById('killerImg');
+    const robertoVideoBox = document.getElementById('robertoVideoBox');
     const killerQuoteText = document.getElementById('killerQuoteText');
     const killerQuestionText = document.getElementById('killerQuestionText');
+    const whyResponseBox = document.getElementById('whyResponseBox');
+    const slowHeart = document.getElementById('slowHeart');
     const finalMessage = document.getElementById('finalMessage');
     const timerDisplay = document.getElementById('timer');
     const mainContainer = document.getElementById('mainContainer');
@@ -510,10 +570,29 @@
         element.classList.add('flash-effect');
     }
 
+    // Normalizar texto para verificar respuestas de "¿Por qué?" y sus variantes
+    function isWhyVariant(text) {
+        const clean = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!]/g, "").trim();
+        return clean === 'por que' || clean === 'porque' || clean === 'por que' || clean === 'porque';
+    }
+
     // Lógica de Validación de Respuestas
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const value = input.value.trim().toLowerCase();
+
+        // Activación de códigos de "¿Por qué?" o cualquiera de sus variantes
+        if (isWhyVariant(value)) {
+            whyResponseBox.style.display = 'block';
+            triggerFlash(whyResponseBox);
+            slowHeart.classList.remove('show');
+            setTimeout(() => {
+                slowHeart.classList.add('show');
+            }, 800);
+            input.value = '';
+            msg.textContent = '';
+            return;
+        }
 
         // Activación del código "azul"
         if (value === 'azul') {
@@ -574,7 +653,9 @@
                 mostrarError();
             }
         } else if (stage === 3) {
-            if (value === 'kiki') {
+            if (value === 'roberto') {
+                irAFaseRoberto();
+            } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
                 mostrarError();
@@ -590,14 +671,17 @@
 
     function irAFaseRoberto() {
         stage = 3;
-        robertoImg.style.display = 'inline-block';
+        robertoImg.style.display = 'none';
         killerImg.style.display = 'none';
         killerQuoteText.style.display = 'none';
         killerQuestionText.style.display = 'none';
+        
+        // Muestra el reproductor del video de Roberto
+        robertoVideoBox.style.display = 'block';
         promptText.style.display = 'block';
-        promptText.textContent = '¿Sabes quien es?';
+        promptText.textContent = '# Ingresa el código Roberto';
         triggerFlash(promptText);
-        triggerFlash(robertoImg);
+        triggerFlash(robertoVideoBox);
         input.value = '';
         msg.textContent = '';
     }
@@ -605,6 +689,7 @@
     function irAFaseKiller() {
         stage = 'killer';
         robertoImg.style.display = 'none';
+        robertoVideoBox.style.display = 'none';
         promptText.style.display = 'none';
         killerImg.style.display = 'inline-block';
         killerQuoteText.style.display = 'block';
