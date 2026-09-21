@@ -43,8 +43,19 @@
         p {
             font-size: 1.1rem;
             color: #93c5fd;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             line-height: 1.5;
+        }
+
+        /* Estilo para la imagen de Roberto */
+        .clue-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            border: 1px solid #2563eb;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
         }
 
         /* Animación de destello para los textos al cambiar */
@@ -117,12 +128,20 @@
 
         .error { color: #f87171; }
 
-        /* Mensaje final al completar las preguntas */
+        /* Mensaje final y Contador */
         .discord-instruction {
             color: #60a5fa;
             font-size: 1.1rem;
             line-height: 1.6;
             text-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
+        }
+
+        #timer {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.5rem;
+            color: #f87171;
+            margin-top: 20px;
+            text-shadow: 0 0 10px rgba(248, 113, 113, 0.7);
         }
 
         /* Pista secreta/oculta */
@@ -182,15 +201,17 @@
 
     <!-- Formulario de Códigos / Preguntas -->
     <form id="codeForm">
+        <img id="robertoImg" src="roberto.png" alt="Pista Roberto" class="clue-image" style="display: none;">
         <p id="promptText"># Ingresa el código</p>
         <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
         <br>
         <button type="submit">INGRESAR</button>
     </form>
 
-    <!-- Contenedor del Mensaje Final para Discord -->
+    <!-- Contenedor del Mensaje Final con Contador -->
     <div id="finalMessage" class="discord-instruction" style="display: none;">
-        Envíame una foto del primer dibujo que te di por Discord.
+        <p>Envíame una foto del primer dibujo que te di por Discord.</p>
+        <div id="timer">24:00:00</div>
     </div>
 
     <div id="responseMsg" class="response-msg"></div>
@@ -219,15 +240,17 @@
     const input = document.getElementById('userInput');
     const msg = document.getElementById('responseMsg');
     const promptText = document.getElementById('promptText');
+    const robertoImg = document.getElementById('robertoImg');
     const finalMessage = document.getElementById('finalMessage');
+    const timerDisplay = document.getElementById('timer');
 
-    // Estado del juego (1: "alfa", 2: "porcelana")
+    // Estado del juego (1: "alfa", 2: "porcelana", 3: "roberto", 4: "kiki")
     let stage = 1;
 
     // Función auxiliar para aplicar la animación de destello
     function triggerFlash(element) {
         element.classList.remove('flash-effect');
-        void element.offsetWidth; // Forzar reflow para reiniciar la animación CSS
+        void element.offsetWidth; // Forzar reflow
         element.classList.add('flash-effect');
     }
 
@@ -244,27 +267,91 @@
                 input.value = '';
                 msg.textContent = '';
             } else if (value === 'porcelana') {
-                // Atajo directo si ingresa "porcelana" de primera
+                irAFaseRoberto();
+            } else if (value === 'roberto') {
+                irAFaseRoberto();
+            } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
-                msg.className = 'response-msg error';
-                msg.textContent = 'Codigo equivocado, Alfa ;p';
+                mostrarError();
             }
         } else if (stage === 2) {
             if (value === 'porcelana') {
+                irAFaseRoberto();
+            } else if (value === 'roberto') {
+                irAFaseRoberto();
+            } else if (value === 'kiki') {
                 mostrarInstruccionDiscord();
             } else {
-                msg.className = 'response-msg error';
-                msg.textContent = 'Codigo equivocado, Alfa ;p';
+                mostrarError();
+            }
+        } else if (stage === 3) {
+            if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
             }
         }
     });
+
+    function irAFaseRoberto() {
+        stage = 3;
+        robertoImg.style.display = 'inline-block';
+        promptText.textContent = '¿Sabes quien es?';
+        triggerFlash(promptText);
+        triggerFlash(robertoImg);
+        input.value = '';
+        msg.textContent = '';
+    }
+
+    function mostrarError() {
+        msg.className = 'response-msg error';
+        msg.textContent = 'Codigo equivocado, Alfa ;p';
+    }
 
     function mostrarInstruccionDiscord() {
         codeForm.style.display = 'none';
         msg.textContent = '';
         finalMessage.style.display = 'block';
         triggerFlash(finalMessage);
+        start24HourTimer();
+    }
+
+    // Lógica del Temporizador en Tiempo Real (24 Horas)
+    function start24HourTimer() {
+        let startTime = localStorage.getItem('arg_timer_start');
+        
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem('arg_timer_start', startTime);
+        }
+
+        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+
+        function updateTimer() {
+            const now = Date.now();
+            const elapsed = now - parseInt(startTime, 10);
+            const remaining = duration - elapsed;
+
+            if (remaining <= 0) {
+                timerDisplay.textContent = "00:00:00";
+                clearInterval(interval);
+                return;
+            }
+
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+            const hStr = String(hours).padStart(2, '0');
+            const mStr = String(minutes).padStart(2, '0');
+            const sStr = String(seconds).padStart(2, '0');
+
+            timerDisplay.textContent = `${hStr}:${mStr}:${sStr}`;
+        }
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
     }
 </script>
 
