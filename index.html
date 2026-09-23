@@ -178,7 +178,7 @@
             }
         }
 
-        input[type="text"] {
+        input[type="text"], textarea {
             background-color: #030712;
             border: 1px solid #2563eb;
             color: #60a5fa;
@@ -195,7 +195,15 @@
             -webkit-user-select: text;
         }
 
-        input[type="text"]:focus {
+        textarea {
+            width: 90%;
+            height: 120px;
+            resize: none;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"]:focus, textarea:focus {
             border-color: #60a5fa;
             box-shadow: 0 0 12px rgba(96, 165, 250, 0.8);
         }
@@ -246,7 +254,7 @@
             color: #60a5fa;
             font-weight: bold;
             opacity: 0;
-            transition: opacity 8s ease-in-out; /* Aparición muy lenta de 8 segundos */
+            transition: opacity 8s ease-in-out;
             text-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa;
         }
 
@@ -446,6 +454,55 @@
                 box-shadow: 0 0 45px rgba(96, 165, 250, 0.8), inset 0 0 30px rgba(59, 130, 246, 0.5);
             }
         }
+
+        /* --- NUEVO: PANTALLA DAVID (Fondo Negro con Corazón azul temblando) --- */
+        #davidPage {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .shaking-blue-heart {
+            font-size: 5rem;
+            color: #3b82f6;
+            text-shadow: 0 0 20px #2563eb, 0 0 40px #60a5fa;
+            animation: heartPulseShake 0.15s infinite alternate ease-in-out;
+        }
+
+        @keyframes heartPulseShake {
+            0% {
+                transform: scale(1) translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.08) translate(-3px, 2px) rotate(-2deg);
+            }
+            100% {
+                transform: scale(0.96) translate(3px, -2px) rotate(2deg);
+            }
+        }
+
+        /* --- NUEVO: PANTALLA VIK (Formulario de correo) --- */
+        #vikPage {
+            display: none;
+            position: relative;
+            text-align: center;
+            background: #0a0d14;
+            padding: 40px 25px;
+            border: 1px solid #1e3a8a;
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(30, 144, 255, 0.25);
+            max-width: 450px;
+            width: 90%;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
@@ -494,9 +551,14 @@
         Todo esto tiene una razón, lo sabrás cuando llegues al final <span id="slowHeart" class="slow-heart">&lt;3</span>
     </div>
 
-    <!-- Contenedor del Mensaje Final con Contador -->
+    <!-- Contenedor del Mensaje Final con entrada para nuevos nombres -->
     <div id="finalMessage" class="discord-instruction" style="display: none;">
-        <p>Has alcanzado la fase final.</p>
+        <p style="margin-bottom: 20px;">Ingresa un nombre</p>
+        <form id="finalNameForm">
+            <input type="text" id="finalNameInput" placeholder="Escribe un nombre..." autocomplete="off">
+            <br>
+            <button type="submit">INGRESAR</button>
+        </form>
         <div id="timer">24:00:00</div>
     </div>
 
@@ -508,11 +570,27 @@
 
 <!-- Página para Swap Sans -->
 <div id="swapPage">
-    <img src="killswap.png" alt="Swap y Killer Sans" class="clue-image">
+    <img src="swap.png" alt="Swap y Killer Sans" class="clue-image">
     <p style="color: #60a5fa; font-size: 1.1rem; line-height: 1.6; text-shadow: 0 0 10px rgba(96, 165, 250, 0.6); margin-bottom: 25px;">
         Así es! Arriba el KillSwap!
     </p>
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
+</div>
+
+<!-- NUEVO: Página para el código "David" -->
+<div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
+    <div class="shaking-blue-heart">💙</div>
+</div>
+
+<!-- NUEVO: Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
+<div id="vikPage">
+    <h1 style="font-size: 1.1rem;">¿Como te sientes realmente?</h1>
+    <form id="feelingsForm" action="https://formspree.io/f/xppwdwaw" method="POST">
+        <textarea name="sentimiento_real" placeholder="Escribe lo que sientes aquí..." required></textarea>
+        <br>
+        <button type="submit">ENVIAR</button>
+    </form>
+    <div id="vikMsg" class="response-msg"></div>
 </div>
 
 <script>
@@ -553,9 +631,15 @@
     const whyResponseBox = document.getElementById('whyResponseBox');
     const slowHeart = document.getElementById('slowHeart');
     const finalMessage = document.getElementById('finalMessage');
+    const finalNameForm = document.getElementById('finalNameForm');
+    const finalNameInput = document.getElementById('finalNameInput');
     const timerDisplay = document.getElementById('timer');
     const mainContainer = document.getElementById('mainContainer');
     const swapPage = document.getElementById('swapPage');
+    const davidPage = document.getElementById('davidPage');
+    const vikPage = document.getElementById('vikPage');
+    const feelingsForm = document.getElementById('feelingsForm');
+    const vikMsg = document.getElementById('vikMsg');
 
     // Variables de intervalos de efectos de fondo
     let heartsInterval = null;
@@ -576,53 +660,75 @@
         return clean === 'por que' || clean === 'porque';
     }
 
-    // Lógica de Validación de Respuestas
-    codeForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const value = input.value.trim().toLowerCase();
+    // Comprobar si el valor es David
+    function isDavid(value) {
+        return value === 'david';
+    }
 
-        // Activación de códigos de "¿Por qué?" o cualquiera de sus variantes
+    // Comprobar si el valor es una variante de Vik
+    function isVikVariant(value) {
+        return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value);
+    }
+
+    // Lógica Centralizada de Entrada de Códigos
+    function processCodeInput(value) {
+        if (isDavid(value)) {
+            irAPaginaDavid();
+            return true;
+        }
+
+        if (isVikVariant(value)) {
+            irAPaginaVik();
+            return true;
+        }
+
         if (isWhyVariant(value)) {
             whyResponseBox.style.display = 'block';
             triggerFlash(whyResponseBox);
             slowHeart.classList.remove('show');
             setTimeout(() => {
                 slowHeart.classList.add('show');
-            }, 1500); // 1.5 segundos de retraso antes de comenzar a desvanecerse muy lentamente
-            input.value = '';
+            }, 1500);
             msg.textContent = '';
-            return;
+            return true;
         }
 
-        // Activación del código "azul"
         if (value === 'azul') {
             desactivarEfectoNoelle();
             activarCorazonesAzules();
             msg.className = 'response-msg success';
             msg.textContent = '💙';
-            input.value = '';
-            return;
+            return true;
         }
 
-        // Activación del código "krisselle"
         if (value === 'krisselle') {
             desactivarCorazonesAzules();
             activarEfectoNoelle();
             msg.className = 'response-msg error';
             msg.textContent = '🔴';
-            input.value = '';
-            return;
+            return true;
         }
 
-        // Activación directa de "killer" o "killer sans"
         if (value === 'killer' || value === 'killer sans') {
             irAFaseKiller();
-            return;
+            return true;
         }
 
-        // Activación directa de "swap" o "swap sans"
         if (value === 'swap' || value === 'swap sans') {
             irAPaginaSwap();
+            return true;
+        }
+
+        return false;
+    }
+
+    // Formulario Principal
+    codeForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const value = input.value.trim().toLowerCase();
+
+        if (processCodeInput(value)) {
+            input.value = '';
             return;
         }
 
@@ -675,7 +781,18 @@
         }
     });
 
-    // Fase al ingresar "porcelana": Muestra únicamente el vídeo musical
+    // Formulario en la pantalla final
+    finalNameForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const value = finalNameInput.value.trim().toLowerCase();
+        if (!processCodeInput(value)) {
+            msg.className = 'response-msg error';
+            msg.textContent = 'Nombre o código no reconocido ;p';
+        } else {
+            finalNameInput.value = '';
+        }
+    });
+
     function irAFaseVideoRoberto() {
         stage = 'video_roberto';
         robertoImg.style.display = 'none';
@@ -684,13 +801,12 @@
         killerQuestionText.style.display = 'none';
         
         robertoVideoBox.style.display = 'block';
-        promptText.style.display = 'none'; // Se oculta cualquier indicación de texto
+        promptText.style.display = 'none';
         triggerFlash(robertoVideoBox);
         input.value = '';
         msg.textContent = '';
     }
 
-    // Fase al ingresar "roberto": Muestra la foto roberto.png y la pregunta "¿Sabes quien es?"
     function irAFasePreguntaRoberto() {
         stage = 'pregunta_roberto';
         robertoVideoBox.style.display = 'none';
@@ -724,8 +840,25 @@
 
     function irAPaginaSwap() {
         mainContainer.style.display = 'none';
+        vikPage.style.display = 'none';
+        davidPage.style.display = 'none';
         swapPage.style.display = 'block';
         triggerFlash(swapPage);
+    }
+
+    function irAPaginaDavid() {
+        mainContainer.style.display = 'none';
+        swapPage.style.display = 'none';
+        vikPage.style.display = 'none';
+        davidPage.style.display = 'flex';
+    }
+
+    function irAPaginaVik() {
+        mainContainer.style.display = 'none';
+        swapPage.style.display = 'none';
+        davidPage.style.display = 'none';
+        vikPage.style.display = 'block';
+        triggerFlash(vikPage);
     }
 
     function mostrarError() {
@@ -740,6 +873,31 @@
         triggerFlash(finalMessage);
         start24HourTimer();
     }
+
+    // Envío del Formulario de Sentimientos por Correo (Formspree)
+    feelingsForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        vikMsg.className = 'response-msg success';
+        vikMsg.textContent = 'Enviando...';
+
+        fetch(feelingsForm.action, {
+            method: 'POST',
+            body: new FormData(feelingsForm),
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                feelingsForm.style.display = 'none';
+                vikMsg.className = 'response-msg success';
+                vikMsg.textContent = 'Mensaje guardado en el abismo. Gracias por responder. 💙';
+            } else {
+                vikMsg.className = 'response-msg error';
+                vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
+            }
+        }).catch(() => {
+            vikMsg.className = 'response-msg error';
+            vikMsg.textContent = 'Error de conexión.';
+        });
+    });
 
     // Lógica de Corazones Azules Flotantes
     function activarCorazonesAzules() {
