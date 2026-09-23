@@ -371,7 +371,7 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Corazones flotantes de fondo para el código AZUL (SVG de David) */
+        /* Corazones flotantes de fondo para el código AZUL */
         #heartsContainer {
             position: absolute;
             top: 0;
@@ -593,7 +593,7 @@
             transition: opacity 0.3s ease-in;
         }
 
-        /* CAPA NEGRA PARA EL EFECTO NO (Por debajo del botón destacado) */
+        /* CAPA NEGRA PARA EL EFECTO NO */
         #blackOutOverlay {
             position: fixed;
             top: 0;
@@ -618,11 +618,10 @@
             top: 0;
             left: 0;
             width: 100vw;
-            height: 50vh;
+            height: 100vh;
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
-            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .star-point {
@@ -672,6 +671,35 @@
                 opacity: 0;
             }
         }
+
+        /* MENSAJE EN LA PÁGINA DE ESTRELLAS */
+        #starsMessage {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            color: #93c5fd;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.3rem;
+            text-align: center;
+            text-shadow: 0 0 12px rgba(59, 130, 246, 0.8), 0 0 25px rgba(96, 165, 250, 0.6);
+            letter-spacing: 1px;
+            pointer-events: none;
+            animation: messageGlowPulse 3s ease-in-out infinite alternate;
+            padding: 20px;
+            background: rgba(10, 13, 20, 0.4);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(30, 144, 255, 0.2);
+            backdrop-filter: blur(2px);
+        }
+
+        @keyframes messageGlowPulse {
+            0% { text-shadow: 0 0 10px rgba(59, 130, 246, 0.6); opacity: 0.85; }
+            100% { text-shadow: 0 0 20px rgba(147, 197, 253, 1), 0 0 35px rgba(59, 130, 246, 0.8); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -685,6 +713,9 @@
 <div id="bottomBlueGlow"></div>
 <div id="sparklesContainer"></div>
 <div id="noelleContainer"></div>
+
+<!-- Mensaje en la pantalla de estrellas -->
+<div id="starsMessage">Entonces continuaremos mas adelante ;)</div>
 
 <!-- Pantalla de Sans -->
 <div id="sansContainer">
@@ -746,14 +777,14 @@
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
-<!-- Página David -->
+<!-- PANTALLA DAVID -->
 <div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
     <svg class="shaking-heart-svg" viewBox="0 0 24 24">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
 </div>
 
-<!-- Página Vik / Calico -->
+<!-- PANTALLA VIK / CALICO -->
 <div id="vikPage">
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
     
@@ -852,6 +883,7 @@
     const blackOutOverlay = document.getElementById('blackOutOverlay');
     const starsContainer = document.getElementById('starsContainer');
     const diagonalParticlesContainer = document.getElementById('diagonalParticlesContainer');
+    const starsMessage = document.getElementById('starsMessage');
     const btnNoChoice = document.getElementById('btnNoChoice');
 
     let heartsInterval = null;
@@ -886,6 +918,7 @@
         if (starsContainer) starsContainer.style.display = 'none';
         if (diagonalParticlesContainer) diagonalParticlesContainer.style.display = 'none';
         if (bottomBlueGlow) bottomBlueGlow.style.display = 'none';
+        if (starsMessage) starsMessage.style.display = 'none';
     }
 
     // Lógica de Códigos
@@ -1174,7 +1207,6 @@
         personalChoiceInput.value = choice;
 
         if (choice === 'No') {
-            // Efecto al presionar NO: Todo negro de fondo, botón NO visible en primer plano
             blackOutOverlay.classList.add('active');
             btnNoChoice.classList.add('btn-no-active');
             
@@ -1214,14 +1246,15 @@
             personalChoiceForm.style.display = 'none';
             calicoHint.style.display = 'none';
             vikMsg.className = 'response-msg success';
-            vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
+            vikMsg.textContent = '';
 
             // Resplandor azul inferior
             bottomBlueGlow.style.display = 'block';
 
-            // Activar estrellas y mover fondo levemente para dar efecto de perspectiva
+            // Activar estrellas, partículas y el mensaje central
             generarEstrellasSuperiores();
             generarParticulasDiagonales();
+            starsMessage.style.display = 'block';
 
         }, 500);
     }
@@ -1238,7 +1271,7 @@
             star.style.width = size + 'px';
             star.style.height = size + 'px';
             star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 45 + 'vh';
+            star.style.top = Math.random() * 100 + 'vh';
             star.style.animationDuration = (Math.random() * 2 + 1) + 's';
             star.style.animationDelay = (Math.random() * 2) + 's';
 
@@ -1291,7 +1324,7 @@
         }, 250);
     }
 
-    // Corazones Azules Flotantes (Utilizando el SVG exacto de David)
+    // Corazones Azules Flotantes
     function activarCorazonesAzules() {
         bottomBlueGlow.style.display = 'block';
         if (heartsInterval !== null) return;
