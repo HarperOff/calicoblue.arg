@@ -40,7 +40,7 @@
             box-shadow: 0 0 25px rgba(30, 144, 255, 0.25), inset 0 0 15px rgba(0, 102, 255, 0.1);
             max-width: 460px;
             width: 90%;
-            z-index: 2; /* Por encima de los corazones */
+            z-index: 5;
             max-height: 92vh;
             overflow-y: auto;
         }
@@ -124,7 +124,7 @@
         /* Reproductor de Video Embebido */
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             border: 1px solid #2563eb;
@@ -142,7 +142,6 @@
             border: 0;
         }
 
-        /* Textos específicos para la fase de Killer */
         .killer-quote {
             color: #f87171;
             font-size: 0.95rem;
@@ -233,6 +232,20 @@
         .btn-choice {
             margin: 10px 8px 0 8px;
             min-width: 100px;
+            transition: all 0.3s ease;
+        }
+
+        /* Estilo rojo al presionar NO */
+        .btn-no-active {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(1.3) !important;
+            background-color: #dc2626 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 30px #ef4444, 0 0 50px #dc2626 !important;
+            z-index: 1000 !important;
+            border: 1px solid #f87171 !important;
         }
 
         .response-msg {
@@ -244,7 +257,6 @@
         .error { color: #f87171; }
         .success { color: #60a5fa; }
 
-        /* Mensaje "¿Por qué?" y Corazón Muy Lento */
         .why-response-box {
             display: none;
             margin-top: 20px;
@@ -268,7 +280,6 @@
             opacity: 1;
         }
 
-        /* Mensaje final y Contador */
         .discord-instruction {
             color: #60a5fa;
             font-size: 1.1rem;
@@ -284,7 +295,6 @@
             text-shadow: 0 0 10px rgba(248, 113, 113, 0.7);
         }
 
-        /* Pista secreta/oculta */
         .secret-hint {
             position: absolute;
             bottom: 8px;
@@ -294,7 +304,6 @@
             pointer-events: none;
         }
 
-        /* Estilo para la pantalla secreta de Sans */
         #sansContainer {
             display: none;
             flex-direction: column;
@@ -328,7 +337,6 @@
             animation: floatText 2s ease-in-out infinite;
         }
 
-        /* Burbuja de Texto de Undertale para Sans */
         .speech-bubble {
             display: none;
             position: absolute;
@@ -363,7 +371,7 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Corazones flotantes de fondo */
+        /* Corazones flotantes de fondo para el código AZUL (SVG de David) */
         #heartsContainer {
             position: absolute;
             top: 0;
@@ -375,17 +383,18 @@
             z-index: 1;
         }
 
-        .blue-heart {
+        .blue-heart-svg {
             position: absolute;
-            bottom: -50px;
-            color: #3b82f6;
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px #2563eb, 0 0 20px #60a5fa;
-            opacity: 0.8;
-            animation: floatUp 6s linear infinite;
+            bottom: -60px;
+            width: 32px;
+            height: 32px;
+            fill: #3b82f6;
+            filter: drop-shadow(0 0 8px #3b82f6) drop-shadow(0 0 18px #60a5fa);
+            opacity: 0.85;
+            animation: floatUpSvg 6s linear infinite;
         }
 
-        @keyframes floatUp {
+        @keyframes floatUpSvg {
             0% {
                 transform: translateY(0) scale(0.8) rotate(0deg);
                 opacity: 0.8;
@@ -394,12 +403,12 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-110vh) scale(1.2) rotate(360deg);
+                transform: translateY(-110vh) scale(1.3) rotate(360deg);
                 opacity: 0;
             }
         }
 
-        /* Resplandor/Brillo azul único desde la parte inferior */
+        /* Resplandor azul único desde la parte inferior */
         #bottomBlueGlow {
             display: none;
             position: fixed;
@@ -410,21 +419,16 @@
             background: linear-gradient(to top, rgba(37, 99, 235, 0.5) 0%, transparent 100%);
             pointer-events: none;
             z-index: 1;
+            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
             animation: glowPulse 3s ease-in-out infinite alternate;
         }
 
         @keyframes glowPulse {
-            0% {
-                opacity: 0.5;
-                height: 180px;
-            }
-            100% {
-                opacity: 0.9;
-                height: 240px;
-            }
+            0% { opacity: 0.5; height: 180px; }
+            100% { opacity: 0.9; height: 240px; }
         }
 
-        /* Efecto Krisselle (Lluvia Infinita de Noelle en ROJO) */
+        /* Efecto Krisselle */
         #noelleContainer {
             display: none;
             position: absolute;
@@ -453,15 +457,11 @@
         }
 
         @keyframes scrollUpNoelle {
-            0% {
-                transform: translateY(0);
-            }
-            100% {
-                transform: translateY(-50%);
-            }
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
         }
 
-        /* Página de Swap Sans con Brillo Azul */
+        /* Página Swap Sans */
         #swapPage {
             display: none;
             position: relative;
@@ -478,12 +478,8 @@
         }
 
         @keyframes blueGlowPage {
-            0% {
-                box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 15px rgba(37, 99, 235, 0.2);
-            }
-            100% {
-                box-shadow: 0 0 45px rgba(96, 165, 250, 0.8), inset 0 0 30px rgba(59, 130, 246, 0.5);
-            }
+            0% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 15px rgba(37, 99, 235, 0.2); }
+            100% { box-shadow: 0 0 45px rgba(96, 165, 250, 0.8), inset 0 0 30px rgba(59, 130, 246, 0.5); }
         }
 
         /* PANTALLA DAVID */
@@ -520,12 +516,8 @@
         }
 
         @keyframes heartGlowPulse {
-            0% {
-                filter: drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 25px #2563eb);
-            }
-            100% {
-                filter: drop-shadow(0 0 25px #60a5fa) drop-shadow(0 0 45px #3b82f6);
-            }
+            0% { filter: drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 25px #2563eb); }
+            100% { filter: drop-shadow(0 0 25px #60a5fa) drop-shadow(0 0 45px #3b82f6); }
         }
 
         /* PANTALLA VIK */
@@ -541,7 +533,6 @@
             max-width: 450px;
             width: 90%;
             z-index: 5;
-            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .calico-hint-text {
@@ -578,21 +569,12 @@
         }
 
         @keyframes floatAndSparkle {
-            0% {
-                transform: translateY(0) scale(0.2) rotate(0deg);
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(-30px) scale(1.1) rotate(90deg);
-            }
-            100% {
-                transform: translateY(-60px) scale(0.3) rotate(180deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) scale(0.2) rotate(0deg); opacity: 0; }
+            50% { opacity: 1; transform: translateY(-30px) scale(1.1) rotate(90deg); }
+            100% { transform: translateY(-60px) scale(0.3) rotate(180deg); opacity: 0; }
         }
 
-        /* EFECTO DE DESTELLO BLANCO EN PANTALLA COMPLETA */
+        /* DESTELLO BLANCO EN PANTALLA COMPLETA */
         #whiteFlashOverlay {
             position: fixed;
             top: 0;
@@ -611,6 +593,25 @@
             transition: opacity 0.3s ease-in;
         }
 
+        /* CAPA NEGRA PARA EL EFECTO NO */
+        #blackOutOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 500;
+            transition: opacity 0.4s ease;
+        }
+
+        #blackOutOverlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
         /* CAPA DE ESTRELLAS SUPERIORES */
         #starsContainer {
             display: none;
@@ -622,6 +623,7 @@
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
+            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .star-point {
@@ -665,9 +667,7 @@
                 transform: translate(0, 0) scale(0.6);
                 opacity: 0;
             }
-            20% {
-                opacity: 0.9;
-            }
+            20% { opacity: 0.9; }
             100% {
                 transform: translate(120px, -105vh) scale(1.2);
                 opacity: 0;
@@ -677,25 +677,14 @@
 </head>
 <body>
 
-<!-- Destello blanco en toda la pantalla -->
+<!-- Capas de efectos globales -->
 <div id="whiteFlashOverlay"></div>
-
-<!-- Contenedor para las estrellas en la parte superior -->
+<div id="blackOutOverlay"></div>
 <div id="starsContainer"></div>
-
-<!-- Contenedor para las partículas diagonales -->
 <div id="diagonalParticlesContainer"></div>
-
-<!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
-
-<!-- Resplandor azul inferior -->
 <div id="bottomBlueGlow"></div>
-
-<!-- Contenedor para los brillitos de Nyx -->
 <div id="sparklesContainer"></div>
-
-<!-- Contenedor para el efecto Krisselle / Noelle -->
 <div id="noelleContainer"></div>
 
 <!-- Pantalla de Sans -->
@@ -782,7 +771,7 @@
     <form id="personalChoiceForm" action="https://formspree.io/f/xppwdwaw" method="POST" style="display: none;">
         <input type="hidden" name="acepta_cosas_personales" id="personalChoiceInput" value="">
         <button type="button" class="btn-choice" onclick="sendPersonalChoice('Sí')">SÍ</button>
-        <button type="button" class="btn-choice" onclick="sendPersonalChoice('No')">NO</button>
+        <button type="button" id="btnNoChoice" class="btn-choice" onclick="sendPersonalChoice('No')">NO</button>
     </form>
 
     <div id="calicoHint" class="calico-hint-text" style="display: none;">
@@ -861,8 +850,10 @@
     const bottomBlueGlow = document.getElementById('bottomBlueGlow');
     const calicoHint = document.getElementById('calicoHint');
     const whiteFlashOverlay = document.getElementById('whiteFlashOverlay');
+    const blackOutOverlay = document.getElementById('blackOutOverlay');
     const starsContainer = document.getElementById('starsContainer');
     const diagonalParticlesContainer = document.getElementById('diagonalParticlesContainer');
+    const btnNoChoice = document.getElementById('btnNoChoice');
 
     let heartsInterval = null;
     let sparklesInterval = null;
@@ -1137,7 +1128,6 @@
         start24HourTimer();
     }
 
-    // Envío del Formulario de Sentimientos por Correo
     feelingsForm.addEventListener('submit', function(e) {
         e.preventDefault();
         vikMsg.className = 'response-msg success';
@@ -1166,9 +1156,21 @@
         });
     });
 
-    // Envío de la Elección Personal (Sí / No) con Secuencia Visual
+    // Envío de la Elección Personal (Sí / No)
     function sendPersonalChoice(choice) {
         personalChoiceInput.value = choice;
+
+        if (choice === 'No') {
+            // Efecto al presionar NO: Todo negro + botón NO en rojo
+            blackOutOverlay.classList.add('active');
+            btnNoChoice.classList.add('btn-no-active');
+            
+            setTimeout(() => {
+                location.reload();
+            }, 1800);
+            return;
+        }
+
         vikMsg.className = 'response-msg success';
         vikMsg.textContent = 'Registrando respuesta...';
 
@@ -1178,14 +1180,7 @@
             headers: { 'Accept': 'application/json' }
         }).then(response => {
             if (response.ok) {
-                if (choice === 'Sí') {
-                    iniciarAnimacionMisticaAceptacion();
-                } else {
-                    personalChoiceForm.style.display = 'none';
-                    calicoHint.style.display = 'none';
-                    vikMsg.className = 'response-msg success';
-                    vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
-                }
+                iniciarAnimacionMisticaAceptacion();
             } else {
                 vikMsg.className = 'response-msg error';
                 vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
@@ -1198,40 +1193,31 @@
 
     // Animación Mística al aceptar "SÍ"
     function iniciarAnimacionMisticaAceptacion() {
-        // 1. Efecto de brillo blanco que cubre la pantalla
         whiteFlashOverlay.classList.add('active');
 
         setTimeout(() => {
-            // Desvanecer el brillo blanco
             whiteFlashOverlay.classList.remove('active');
 
-            // Ocultar formulario de botones
             personalChoiceForm.style.display = 'none';
             calicoHint.style.display = 'none';
             vikMsg.className = 'response-msg success';
             vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
 
-            // 2. La cámara (el recuadro) baja lentamente
-            vikPage.style.transform = 'translateY(120px)';
-
-            // 3. Activar brillo azul desde abajo
+            // Resplandor azul inferior
             bottomBlueGlow.style.display = 'block';
 
-            // 4. Generar estrellas arriba
+            // Activar estrellas y mover fondo levemente para dar efecto de perspectiva
             generarEstrellasSuperiores();
-
-            // 5. Generar partículas en diagonal desde abajo
             generarParticulasDiagonales();
 
         }, 500);
     }
 
-    // Generador de Estrellas Superiores
     function generarEstrellasSuperiores() {
         starsContainer.style.display = 'block';
         starsContainer.innerHTML = '';
 
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 45; i++) {
             const star = document.createElement('div');
             star.classList.add('star-point');
             
@@ -1247,7 +1233,6 @@
         }
     }
 
-    // Generador de Partículas Diagonales
     function generarParticulasDiagonales() {
         diagonalParticlesContainer.style.display = 'block';
         diagonalParticlesContainer.innerHTML = '';
@@ -1264,13 +1249,10 @@
 
             diagonalParticlesContainer.appendChild(particle);
 
-            setTimeout(() => {
-                particle.remove();
-            }, 6000);
+            setTimeout(() => { particle.remove(); }, 6000);
         }, 200);
     }
 
-    // Lógica de Brillitos Vectoriales (SVG) para Nyx
     function activarBrillitosNyx() {
         if (sparklesInterval !== null) return;
         const sparklesContainer = document.getElementById('sparklesContainer');
@@ -1296,24 +1278,31 @@
         }, 250);
     }
 
-    // Corazones Azules Flotantes
+    // Corazones Azules Flotantes (Utilizando el SVG exacto de David)
     function activarCorazonesAzules() {
         bottomBlueGlow.style.display = 'block';
         if (heartsInterval !== null) return;
         const heartsContainer = document.getElementById('heartsContainer');
 
         heartsInterval = setInterval(() => {
-            const heart = document.createElement('div');
-            heart.classList.add('blue-heart');
-            heart.innerHTML = '💙';
-            heart.style.left = Math.random() * 100 + 'vw';
+            const heart = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            heart.setAttribute('class', 'blue-heart-svg');
+            heart.setAttribute('viewBox', '0 0 24 24');
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+            heart.appendChild(path);
+
+            const randomSize = Math.random() * 20 + 20;
+            heart.style.width = randomSize + 'px';
+            heart.style.height = randomSize + 'px';
+            heart.style.left = Math.random() * 95 + 'vw';
             heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-            heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
             
             heartsContainer.appendChild(heart);
 
             setTimeout(() => { heart.remove(); }, 7000);
-        }, 400);
+        }, 350);
     }
 
     function desactivarCorazonesAzules() {
