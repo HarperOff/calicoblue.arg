@@ -399,15 +399,15 @@
             }
         }
 
-        /* Resplandor/Brillo azul único desde la parte inferior para el código "azul" */
+        /* Resplandor/Brillo azul único desde la parte inferior */
         #bottomBlueGlow {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100vw;
-            height: 220px;
-            background: linear-gradient(to top, rgba(37, 99, 235, 0.4) 0%, transparent 100%);
+            height: 250px;
+            background: linear-gradient(to top, rgba(37, 99, 235, 0.5) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 100%);
             pointer-events: none;
             z-index: 1;
             animation: glowPulse 3s ease-in-out infinite alternate;
@@ -416,11 +416,71 @@
         @keyframes glowPulse {
             0% {
                 opacity: 0.5;
-                height: 180px;
+                height: 200px;
             }
             100% {
+                opacity: 0.95;
+                height: 280px;
+            }
+        }
+
+        /* Capa para la luz blanca que cubre toda la pantalla */
+        #whiteFlashOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            transition: opacity 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        #whiteFlashOverlay.active {
+            opacity: 1;
+        }
+
+        /* Contenedor y estilo de las partículas / pétalos voladores */
+        #bluePetalsContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .blue-petal {
+            position: absolute;
+            bottom: -30px;
+            background: linear-gradient(135deg, #93c5fd, #2563eb);
+            border-radius: 80% 0 80% 0; /* Forma curva tipo pétalo/hoja */
+            opacity: 0.85;
+            box-shadow: 0 0 12px #3b82f6, 0 0 22px #60a5fa;
+            animation: floatPetal 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes floatPetal {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg) scale(0.6);
+                opacity: 0;
+            }
+            15% {
                 opacity: 0.9;
-                height: 240px;
+            }
+            50% {
+                transform: translateY(-50vh) translateX(35px) rotate(180deg) scale(1);
+            }
+            85% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-105vh) translateX(-25px) rotate(360deg) scale(0.7);
+                opacity: 0;
             }
         }
 
@@ -588,6 +648,12 @@
 </head>
 <body>
 
+<!-- Capa para el Destello Blanco de Pantalla Completa -->
+<div id="whiteFlashOverlay"></div>
+
+<!-- Contenedor para las partículas/pétalos azules voladores -->
+<div id="bluePetalsContainer"></div>
+
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
 
@@ -721,13 +787,12 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
-    // Interacción al hacer clic/tocar a Sans (con probabilidad de preguntar por un abrazo)
+    // Interacción al hacer clic/tocar a Sans
     const sansSprite = document.getElementById('sansSprite');
     const sansBubble = document.getElementById('sansBubble');
 
     if (sansSprite) {
         sansSprite.addEventListener('click', function() {
-            // Genera un número entre 0 y 1 (50% de probabilidad para la pregunta del abrazo)
             const isHugQuestion = Math.random() < 0.5;
 
             if (isHugQuestion) {
@@ -766,22 +831,22 @@
     const personalChoiceInput = document.getElementById('personalChoiceInput');
     const vikMsg = document.getElementById('vikMsg');
     const bottomBlueGlow = document.getElementById('bottomBlueGlow');
+    const whiteFlashOverlay = document.getElementById('whiteFlashOverlay');
 
     // Variables de intervalos de efectos
     let heartsInterval = null;
     let sparklesInterval = null;
+    let petalsInterval = null;
 
     // Estado del juego
     let stage = 1;
 
-    // Función auxiliar para aplicar la animación de destello
     function triggerFlash(element) {
         element.classList.remove('flash-effect');
         void element.offsetWidth; // Forzar reflow
         element.classList.add('flash-effect');
     }
 
-    // Normalizar texto para verificar respuestas
     function isWhyVariant(text) {
         const clean = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!]/g, "").trim();
         return clean === 'por que' || clean === 'porque';
@@ -799,13 +864,11 @@
         return value === 'nyx';
     }
 
-    // Capitalizar la primera letra del nombre ingresado
     function capitalizeName(str) {
         if (!str) return '';
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // Lógica Centralizada de Entrada de Códigos
     function processCodeInput(value, rawInputText) {
         if (isDavid(value)) {
             irAPaginaDavid();
@@ -863,7 +926,6 @@
         return false;
     }
 
-    // Formulario Principal
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const rawText = input.value.trim();
@@ -923,7 +985,6 @@
         }
     });
 
-    // Formulario en la pantalla final
     finalNameForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const rawText = finalNameInput.value.trim();
@@ -1038,7 +1099,6 @@
         start24HourTimer();
     }
 
-    // Envío del Formulario de Sentimientos por Correo (Formspree)
     feelingsForm.addEventListener('submit', function(e) {
         e.preventDefault();
         vikMsg.className = 'response-msg success';
@@ -1066,7 +1126,7 @@
         });
     });
 
-    // Envío de la Elección Personal (Sí / No) por Correo
+    // Envío de la Elección Personal (Sí / No) con Transición Visual en "Sí"
     function sendPersonalChoice(choice) {
         personalChoiceInput.value = choice;
         vikMsg.className = 'response-msg success';
@@ -1081,6 +1141,11 @@
                 personalChoiceForm.style.display = 'none';
                 vikMsg.className = 'response-msg success';
                 vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
+
+                // Si la respuesta es "Sí", activar el destello blanco y la magia azul
+                if (choice === 'Sí') {
+                    triggerWhiteToBlueVisualEffect();
+                }
             } else {
                 vikMsg.className = 'response-msg error';
                 vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
@@ -1091,7 +1156,54 @@
         });
     }
 
-    // Lógica de Brillitos Vectoriales (SVG) para Nyx
+    // Efecto Especial: Destello Blanco -> Desvanecido -> Brillo Azul Inferior + Pétalos Flotantes
+    function triggerWhiteToBlueVisualEffect() {
+        // 1. Cubrir con destello blanco brillante
+        whiteFlashOverlay.classList.add('active');
+
+        setTimeout(() => {
+            // 2. Activar el resplandor azul inferior
+            bottomBlueGlow.style.display = 'block';
+
+            // 3. Comenzar a generar pétalos/partículas azules voladoras
+            activarPetalosAzules();
+
+            // 4. Desvanecer suavemente la luz blanca
+            whiteFlashOverlay.classList.remove('active');
+        }, 1200);
+    }
+
+    function activarPetalosAzules() {
+        if (petalsInterval !== null) return;
+
+        const petalsContainer = document.getElementById('bluePetalsContainer');
+
+        petalsInterval = setInterval(() => {
+            const petal = document.createElement('div');
+            petal.classList.add('blue-petal');
+
+            // Variación aleatoria de tamaño para aspecto de hoja/pétalo
+            const width = Math.random() * 10 + 8;  // 8px a 18px
+            const height = Math.random() * 16 + 12; // 12px a 28px
+            petal.style.width = width + 'px';
+            petal.style.height = height + 'px';
+
+            // Posición horizontal inicial desde el fondo
+            petal.style.left = Math.random() * 95 + 'vw';
+
+            // Velocidad y duración de vuelo variables
+            const duration = Math.random() * 2.5 + 4; // 4s a 6.5s
+            petal.style.animationDuration = duration + 's';
+
+            petalsContainer.appendChild(petal);
+
+            // Eliminar pétalo cuando termina su animación
+            setTimeout(() => {
+                petal.remove();
+            }, duration * 1000);
+        }, 220);
+    }
+
     function activarBrillitosNyx() {
         if (sparklesInterval !== null) return;
 
@@ -1120,7 +1232,6 @@
         }, 250);
     }
 
-    // Lógica de Corazones Azules Flotantes y Resplandor Inferior
     function activarCorazonesAzules() {
         bottomBlueGlow.style.display = 'block';
 
@@ -1154,7 +1265,6 @@
         document.getElementById('heartsContainer').innerHTML = '';
     }
 
-    // Lógica del Efecto "Krisselle" (Lluvia infinita de Noelle en ROJO)
     function activarEfectoNoelle() {
         const noelleContainer = document.getElementById('noelleContainer');
         noelleContainer.innerHTML = '';
@@ -1184,7 +1294,6 @@
         noelleContainer.innerHTML = '';
     }
 
-    // Lógica del Temporizador en Tiempo Real (24 Horas)
     function start24HourTimer() {
         let startTime = localStorage.getItem('arg_timer_start');
         
@@ -1193,7 +1302,7 @@
             localStorage.setItem('arg_timer_start', startTime);
         }
 
-        const duration = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        const duration = 24 * 60 * 60 * 1000;
 
         function updateTimer() {
             const now = Date.now();
