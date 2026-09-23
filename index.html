@@ -393,7 +393,7 @@
             }
         }
 
-        /* NUEVO: Resplandor/Brillo azul desde la parte inferior para el código "azul" */
+        /* Resplandor/Brillo azul desde la parte inferior para el código "azul" */
         #bottomBlueGlow {
             display: none;
             position: absolute;
@@ -534,7 +534,7 @@
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
 
-<!-- NUEVO: Resplandor azul inferior -->
+<!-- Resplandor azul inferior -->
 <div id="bottomBlueGlow"></div>
 
 <!-- Contenedor para el efecto Krisselle / Noelle -->
@@ -611,6 +611,9 @@
 
 <!-- Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
 <div id="vikPage">
+    <!-- Botón de recarga dentro de la página de sentimientos -->
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
+    
     <h1 id="vikQuestion" style="font-size: 1.1rem; line-height: 1.5;">¿Como te sientes realmente?</h1>
     <form id="feelingsForm" action="https://formspree.io/f/xppwdwaw" method="POST">
         <textarea name="sentimiento_real" placeholder="Escribe lo que sientes aquí..." required></textarea>
@@ -897,6 +900,8 @@
         
         // Personaliza la pregunta con el nombre ingresado
         vikQuestion.textContent = `¿Como te sientes realmente, ${nameEntered}?`;
+        feelingsForm.style.display = 'block';
+        vikMsg.textContent = '';
         
         vikPage.style.display = 'block';
         triggerFlash(vikPage);
@@ -929,7 +934,10 @@
             if (response.ok) {
                 feelingsForm.style.display = 'none';
                 vikMsg.className = 'response-msg success';
-                vikMsg.textContent = 'Mensaje guardado en el abismo. Gracias por responder. 💙';
+                
+                // Cambia la pregunta al enviar la respuesta
+                vikQuestion.textContent = '¿Aceptas que a partir de este punto las cosas se hagan mas personales?';
+                triggerFlash(vikQuestion);
             } else {
                 vikMsg.className = 'response-msg error';
                 vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
@@ -942,7 +950,7 @@
 
     // Lógica de Corazones Azules Flotantes y Resplandor Inferior
     function activarCorazonesAzules() {
-        bottomBlueGlow.style.display = 'block'; // Muestra el resplandor inferior
+        bottomBlueGlow.style.display = 'block';
 
         if (heartsInterval !== null) return;
 
@@ -965,7 +973,7 @@
     }
 
     function desactivarCorazonesAzules() {
-        bottomBlueGlow.style.display = 'none'; // Oculta el resplandor inferior
+        bottomBlueGlow.style.display = 'none';
 
         if (heartsInterval !== null) {
             clearInterval(heartsInterval);
