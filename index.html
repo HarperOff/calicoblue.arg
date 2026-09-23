@@ -505,7 +505,6 @@
             width: 120px;
             height: 120px;
             fill: #3b82f6;
-            /* Filtro de brillo azul consistente en PC y Móviles */
             filter: drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 35px #2563eb);
             display: inline-block;
             animation: jitterShake 0.08s infinite linear, heartGlowPulse 1.5s infinite alternate ease-in-out;
@@ -544,7 +543,7 @@
             z-index: 5;
         }
 
-        /* PANTALLA NYX (Foto, Saludo y Brillitos) */
+        /* PANTALLA NYX (Foto, Saludo y Brillitos SVG) */
         #nyxPage {
             display: none;
             position: relative;
@@ -559,25 +558,29 @@
             z-index: 5;
         }
 
-        .nyx-sparkle {
+        /* Estilo para los brillitos vectoriales flotantes */
+        .nyx-sparkle-svg {
             position: fixed;
             pointer-events: none;
-            font-size: 1.2rem;
+            width: 28px;
+            height: 28px;
+            fill: #93c5fd;
+            filter: drop-shadow(0 0 6px #60a5fa) drop-shadow(0 0 12px #3b82f6);
             animation: floatAndSparkle 3s ease-in-out infinite;
             z-index: 6;
         }
 
         @keyframes floatAndSparkle {
             0% {
-                transform: translateY(0) scale(0.5) rotate(0deg);
+                transform: translateY(0) scale(0.2) rotate(0deg);
                 opacity: 0;
             }
             50% {
                 opacity: 1;
-                transform: translateY(-25px) scale(1.2) rotate(180deg);
+                transform: translateY(-30px) scale(1.1) rotate(90deg);
             }
             100% {
-                transform: translateY(-50px) scale(0.6) rotate(360deg);
+                transform: translateY(-60px) scale(0.3) rotate(180deg);
                 opacity: 0;
             }
         }
@@ -661,7 +664,7 @@
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
-<!-- Página para el código "David" con SVG para compatibilidad móvil perfecta -->
+<!-- Página para el código "David" -->
 <div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
     <svg class="shaking-heart-svg" viewBox="0 0 24 24">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -691,7 +694,7 @@
     <div id="vikMsg" class="response-msg"></div>
 </div>
 
-<!-- NUEVA PÁGINA: Código "Nyx" -->
+<!-- PÁGINA: Código "Nyx" -->
 <div id="nyxPage">
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
     <img src="nyx.png" alt="Nyx" class="clue-image" style="max-height: 250px;">
@@ -1077,17 +1080,25 @@
         });
     }
 
-    // Lógica del Efecto de Brillitos de Nyx
+    // Lógica de Brillitos Vectoriales (SVG) para Nyx
     function activarBrillitosNyx() {
         if (sparklesInterval !== null) return;
 
         const sparklesContainer = document.getElementById('sparklesContainer');
-        const icons = ['✨', '💖', '⭐', '✨', '💙'];
 
         sparklesInterval = setInterval(() => {
-            const sparkle = document.createElement('div');
-            sparkle.classList.add('nyx-sparkle');
-            sparkle.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            const sparkle = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            sparkle.setAttribute('class', 'nyx-sparkle-svg');
+            sparkle.setAttribute('viewBox', '0 0 24 24');
+
+            // SVG de estrella/destello de 4 puntas
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z');
+            sparkle.appendChild(path);
+
+            const randomSize = Math.random() * 18 + 14; // Tamaños variados
+            sparkle.style.width = randomSize + 'px';
+            sparkle.style.height = randomSize + 'px';
             sparkle.style.left = Math.random() * 90 + 5 + 'vw';
             sparkle.style.top = Math.random() * 80 + 10 + 'vh';
             
@@ -1096,7 +1107,7 @@
             setTimeout(() => {
                 sparkle.remove();
             }, 3000);
-        }, 300);
+        }, 250);
     }
 
     // Lógica de Corazones Azules Flotantes y Resplandor Inferior
