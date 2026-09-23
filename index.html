@@ -455,7 +455,7 @@
             }
         }
 
-        /* --- NUEVO: PANTALLA DAVID (Fondo Negro con Corazón azul temblando) --- */
+        /* PANTALLA DAVID (Fondo Negro con Corazón azul agitándose/temblando) */
         #davidPage {
             display: none;
             position: fixed;
@@ -474,22 +474,20 @@
             font-size: 5rem;
             color: #3b82f6;
             text-shadow: 0 0 20px #2563eb, 0 0 40px #60a5fa;
-            animation: heartPulseShake 0.15s infinite alternate ease-in-out;
+            display: inline-block;
+            animation: jitterShake 0.08s infinite linear;
         }
 
-        @keyframes heartPulseShake {
-            0% {
-                transform: scale(1) translate(0, 0) rotate(0deg);
-            }
-            50% {
-                transform: scale(1.08) translate(-3px, 2px) rotate(-2deg);
-            }
-            100% {
-                transform: scale(0.96) translate(3px, -2px) rotate(2deg);
-            }
+        @keyframes jitterShake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-4px, 3px) rotate(-3deg); }
+            40% { transform: translate(3px, -4px) rotate(4deg); }
+            60% { transform: translate(-3px, -2px) rotate(-2deg); }
+            80% { transform: translate(4px, 2px) rotate(3deg); }
+            100% { transform: translate(-2px, 4px) rotate(-1deg); }
         }
 
-        /* --- NUEVO: PANTALLA VIK (Formulario de correo) --- */
+        /* PANTALLA VIK (Formulario de correo) */
         #vikPage {
             display: none;
             position: relative;
@@ -577,12 +575,12 @@
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
-<!-- NUEVO: Página para el código "David" -->
+<!-- Página para el código "David" -->
 <div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
     <div class="shaking-blue-heart">💙</div>
 </div>
 
-<!-- NUEVO: Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
+<!-- Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
 <div id="vikPage">
     <h1 style="font-size: 1.1rem;">¿Como te sientes realmente?</h1>
     <form id="feelingsForm" action="https://formspree.io/f/xppwdwaw" method="POST">
@@ -660,12 +658,10 @@
         return clean === 'por que' || clean === 'porque';
     }
 
-    // Comprobar si el valor es David
     function isDavid(value) {
         return value === 'david';
     }
 
-    // Comprobar si el valor es una variante de Vik
     function isVikVariant(value) {
         return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value);
     }
