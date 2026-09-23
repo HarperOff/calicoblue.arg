@@ -235,7 +235,7 @@
             transition: all 0.3s ease;
         }
 
-        /* Estilo rojo al presionar NO */
+        /* Estilo para mantener visible y rojo el botón NO sobre la pantalla negra */
         .btn-no-active {
             position: fixed !important;
             top: 50% !important;
@@ -244,8 +244,9 @@
             background-color: #dc2626 !important;
             color: #ffffff !important;
             box-shadow: 0 0 30px #ef4444, 0 0 50px #dc2626 !important;
-            z-index: 1000 !important;
-            border: 1px solid #f87171 !important;
+            z-index: 1001 !important; /* z-index superior a la capa de sombra negra */
+            border: 2px solid #f87171 !important;
+            pointer-events: none;
         }
 
         .response-msg {
@@ -380,7 +381,7 @@
             height: 100%;
             overflow: hidden;
             pointer-events: none;
-            z-index: 1;
+            z-index: 2;
         }
 
         .blue-heart-svg {
@@ -419,7 +420,6 @@
             background: linear-gradient(to top, rgba(37, 99, 235, 0.5) 0%, transparent 100%);
             pointer-events: none;
             z-index: 1;
-            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
             animation: glowPulse 3s ease-in-out infinite alternate;
         }
 
@@ -438,7 +438,7 @@
             height: 100vh;
             overflow: hidden;
             pointer-events: none;
-            z-index: 1;
+            z-index: 2;
             font-family: 'Press Start 2P', monospace;
             font-size: 0.8rem;
             color: #f87171;
@@ -603,7 +603,7 @@
             background-color: #000000;
             opacity: 0;
             pointer-events: none;
-            z-index: 500;
+            z-index: 1000;
             transition: opacity 0.4s ease;
         }
 
@@ -623,7 +623,6 @@
             pointer-events: none;
             z-index: 1;
             overflow: hidden;
-            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .star-point {
@@ -880,7 +879,7 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // Lógica de Códigos
+    // Lógica de Códigos (REMOVIDAS las cancelaciones de efectos globales)
     function processCodeInput(value, rawInputText) {
         if (isDavid(value)) {
             irAPaginaDavid();
@@ -1161,7 +1160,7 @@
         personalChoiceInput.value = choice;
 
         if (choice === 'No') {
-            // Efecto al presionar NO: Todo negro + botón NO en rojo
+            // Efecto AL PULSAR "NO": Todo negro inmediato manteniendo únicamente el botón en rojo
             blackOutOverlay.classList.add('active');
             btnNoChoice.classList.add('btn-no-active');
             
@@ -1206,7 +1205,7 @@
             // Resplandor azul inferior
             bottomBlueGlow.style.display = 'block';
 
-            // Activar estrellas y mover fondo levemente para dar efecto de perspectiva
+            // Activar estrellas y partículas flotantes
             generarEstrellasSuperiores();
             generarParticulasDiagonales();
 
