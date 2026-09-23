@@ -65,6 +65,7 @@
             outline: none;
             box-shadow: 0 0 8px rgba(30, 144, 255, 0.2);
             transition: all 0.3s ease;
+            z-index: 10;
         }
 
         .reload-icon-btn:hover {
@@ -485,7 +486,7 @@
             }
         }
 
-        /* PANTALLA DAVID (Fondo Negro con Corazón azul agitándose) */
+        /* PANTALLA DAVID (Fondo Negro con Corazón azul SVG temblando + Brillo vector) */
         #davidPage {
             display: none;
             position: fixed;
@@ -500,12 +501,14 @@
             flex-direction: column;
         }
 
-        .shaking-blue-heart {
-            font-size: 5rem;
-            color: #3b82f6;
-            text-shadow: 0 0 20px #2563eb, 0 0 40px #60a5fa;
+        .shaking-heart-svg {
+            width: 120px;
+            height: 120px;
+            fill: #3b82f6;
+            /* Filtro de brillo azul consistente en PC y Móviles */
+            filter: drop-shadow(0 0 15px #3b82f6) drop-shadow(0 0 35px #2563eb);
             display: inline-block;
-            animation: jitterShake 0.08s infinite linear;
+            animation: jitterShake 0.08s infinite linear, heartGlowPulse 1.5s infinite alternate ease-in-out;
         }
 
         @keyframes jitterShake {
@@ -515,6 +518,15 @@
             60% { transform: translate(-3px, -2px) rotate(-2deg); }
             80% { transform: translate(4px, 2px) rotate(3deg); }
             100% { transform: translate(-2px, 4px) rotate(-1deg); }
+        }
+
+        @keyframes heartGlowPulse {
+            0% {
+                filter: drop-shadow(0 0 10px #3b82f6) drop-shadow(0 0 25px #2563eb);
+            }
+            100% {
+                filter: drop-shadow(0 0 25px #60a5fa) drop-shadow(0 0 45px #3b82f6);
+            }
         }
 
         /* PANTALLA VIK (Formulario de correo y Pregunta Personal) */
@@ -531,6 +543,44 @@
             width: 90%;
             z-index: 5;
         }
+
+        /* PANTALLA NYX (Foto, Saludo y Brillitos) */
+        #nyxPage {
+            display: none;
+            position: relative;
+            text-align: center;
+            background: #0a0d14;
+            padding: 40px 25px;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.35);
+            max-width: 450px;
+            width: 90%;
+            z-index: 5;
+        }
+
+        .nyx-sparkle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.2rem;
+            animation: floatAndSparkle 3s ease-in-out infinite;
+            z-index: 6;
+        }
+
+        @keyframes floatAndSparkle {
+            0% {
+                transform: translateY(0) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-25px) scale(1.2) rotate(180deg);
+            }
+            100% {
+                transform: translateY(-50px) scale(0.6) rotate(360deg);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -540,6 +590,9 @@
 
 <!-- Resplandor azul inferior único -->
 <div id="bottomBlueGlow"></div>
+
+<!-- Contenedor para los brillitos de Nyx -->
+<div id="sparklesContainer"></div>
 
 <!-- Contenedor para el efecto Krisselle / Noelle -->
 <div id="noelleContainer"></div>
@@ -608,9 +661,11 @@
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
-<!-- Página para el código "David" -->
+<!-- Página para el código "David" con SVG para compatibilidad móvil perfecta -->
 <div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
-    <div class="shaking-blue-heart">💙</div>
+    <svg class="shaking-heart-svg" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
 </div>
 
 <!-- Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
@@ -626,7 +681,7 @@
         <button type="submit">ENVIAR</button>
     </form>
 
-    <!-- Formulario 2: Confirmación Sí / No (Envío automático) -->
+    <!-- Formulario 2: Confirmación Sí / No -->
     <form id="personalChoiceForm" action="https://formspree.io/f/xppwdwaw" method="POST" style="display: none;">
         <input type="hidden" name="acepta_cosas_personales" id="personalChoiceInput" value="">
         <button type="button" class="btn-choice" onclick="sendPersonalChoice('Sí')">SÍ</button>
@@ -634,6 +689,15 @@
     </form>
 
     <div id="vikMsg" class="response-msg"></div>
+</div>
+
+<!-- NUEVA PÁGINA: Código "Nyx" -->
+<div id="nyxPage">
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
+    <img src="nyx.png" alt="Nyx" class="clue-image" style="max-height: 250px;">
+    <p style="color: #60a5fa; font-size: 1.2rem; font-weight: bold; text-shadow: 0 0 12px rgba(96, 165, 250, 0.8); margin-top: 15px;">
+        Hola, Mamá/Papá! :3
+    </p>
 </div>
 
 <script>
@@ -681,6 +745,7 @@
     const swapPage = document.getElementById('swapPage');
     const davidPage = document.getElementById('davidPage');
     const vikPage = document.getElementById('vikPage');
+    const nyxPage = document.getElementById('nyxPage');
     const vikQuestion = document.getElementById('vikQuestion');
     const feelingsForm = document.getElementById('feelingsForm');
     const personalChoiceForm = document.getElementById('personalChoiceForm');
@@ -688,8 +753,9 @@
     const vikMsg = document.getElementById('vikMsg');
     const bottomBlueGlow = document.getElementById('bottomBlueGlow');
 
-    // Variables de intervalos de efectos de fondo
+    // Variables de intervalos de efectos
     let heartsInterval = null;
+    let sparklesInterval = null;
 
     // Estado del juego
     let stage = 1;
@@ -701,7 +767,7 @@
         element.classList.add('flash-effect');
     }
 
-    // Normalizar texto para verificar respuestas de "¿Por qué?" y sus variantes
+    // Normalizar texto para verificar respuestas
     function isWhyVariant(text) {
         const clean = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿?¡!]/g, "").trim();
         return clean === 'por que' || clean === 'porque';
@@ -713,6 +779,10 @@
 
     function isVikVariant(value) {
         return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value);
+    }
+
+    function isNyx(value) {
+        return value === 'nyx';
     }
 
     // Capitalizar la primera letra del nombre ingresado
@@ -731,6 +801,11 @@
         if (isVikVariant(value)) {
             const formattedName = capitalizeName(rawInputText || value);
             irAPaginaVik(formattedName);
+            return true;
+        }
+
+        if (isNyx(value)) {
+            irAPaginaNyx();
             return true;
         }
 
@@ -897,6 +972,7 @@
         mainContainer.style.display = 'none';
         vikPage.style.display = 'none';
         davidPage.style.display = 'none';
+        nyxPage.style.display = 'none';
         swapPage.style.display = 'block';
         triggerFlash(swapPage);
     }
@@ -905,6 +981,7 @@
         mainContainer.style.display = 'none';
         swapPage.style.display = 'none';
         vikPage.style.display = 'none';
+        nyxPage.style.display = 'none';
         davidPage.style.display = 'flex';
     }
 
@@ -912,8 +989,8 @@
         mainContainer.style.display = 'none';
         swapPage.style.display = 'none';
         davidPage.style.display = 'none';
+        nyxPage.style.display = 'none';
         
-        // Muestra el formulario inicial con el nombre
         vikQuestion.textContent = `¿Como te sientes realmente, ${nameEntered}?`;
         feelingsForm.style.display = 'block';
         personalChoiceForm.style.display = 'none';
@@ -921,6 +998,17 @@
         
         vikPage.style.display = 'block';
         triggerFlash(vikPage);
+    }
+
+    function irAPaginaNyx() {
+        mainContainer.style.display = 'none';
+        swapPage.style.display = 'none';
+        davidPage.style.display = 'none';
+        vikPage.style.display = 'none';
+        
+        nyxPage.style.display = 'block';
+        triggerFlash(nyxPage);
+        activarBrillitosNyx();
     }
 
     function mostrarError() {
@@ -951,7 +1039,6 @@
                 feelingsForm.style.display = 'none';
                 vikMsg.textContent = '';
                 
-                // Cambia a la pregunta personal con botones Sí / No
                 vikQuestion.textContent = '¿Aceptas que a partir de este punto las cosas se hagan mas personales?';
                 triggerFlash(vikQuestion);
                 personalChoiceForm.style.display = 'block';
@@ -988,6 +1075,28 @@
             vikMsg.className = 'response-msg error';
             vikMsg.textContent = 'Error de conexión.';
         });
+    }
+
+    // Lógica del Efecto de Brillitos de Nyx
+    function activarBrillitosNyx() {
+        if (sparklesInterval !== null) return;
+
+        const sparklesContainer = document.getElementById('sparklesContainer');
+        const icons = ['✨', '💖', '⭐', '✨', '💙'];
+
+        sparklesInterval = setInterval(() => {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('nyx-sparkle');
+            sparkle.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+            sparkle.style.left = Math.random() * 90 + 5 + 'vw';
+            sparkle.style.top = Math.random() * 80 + 10 + 'vh';
+            
+            sparklesContainer.appendChild(sparkle);
+
+            setTimeout(() => {
+                sparkle.remove();
+            }, 3000);
+        }, 300);
     }
 
     // Lógica de Corazones Azules Flotantes y Resplandor Inferior
