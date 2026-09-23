@@ -393,6 +393,32 @@
             }
         }
 
+        /* NUEVO: Resplandor/Brillo azul desde la parte inferior para el código "azul" */
+        #bottomBlueGlow {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(to top, rgba(37, 99, 235, 0.45) 0%, rgba(30, 144, 255, 0.15) 50%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+            box-shadow: 0 -20px 50px rgba(59, 130, 246, 0.3);
+            animation: glowPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            0% {
+                opacity: 0.6;
+                height: 220px;
+            }
+            100% {
+                opacity: 1;
+                height: 280px;
+            }
+        }
+
         /* Efecto Krisselle (Lluvia Infinita de Noelle en ROJO) */
         #noelleContainer {
             display: none;
@@ -455,7 +481,7 @@
             }
         }
 
-        /* PANTALLA DAVID (Fondo Negro con Corazón azul agitándose/temblando) */
+        /* PANTALLA DAVID (Fondo Negro con Corazón azul agitándose) */
         #davidPage {
             display: none;
             position: fixed;
@@ -507,6 +533,9 @@
 
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
+
+<!-- NUEVO: Resplandor azul inferior -->
+<div id="bottomBlueGlow"></div>
 
 <!-- Contenedor para el efecto Krisselle / Noelle -->
 <div id="noelleContainer"></div>
@@ -582,7 +611,7 @@
 
 <!-- Página para los códigos "Vik", "Viktor", "Viktoria", "Victoria" -->
 <div id="vikPage">
-    <h1 style="font-size: 1.1rem;">¿Como te sientes realmente?</h1>
+    <h1 id="vikQuestion" style="font-size: 1.1rem; line-height: 1.5;">¿Como te sientes realmente?</h1>
     <form id="feelingsForm" action="https://formspree.io/f/xppwdwaw" method="POST">
         <textarea name="sentimiento_real" placeholder="Escribe lo que sientes aquí..." required></textarea>
         <br>
@@ -636,8 +665,10 @@
     const swapPage = document.getElementById('swapPage');
     const davidPage = document.getElementById('davidPage');
     const vikPage = document.getElementById('vikPage');
+    const vikQuestion = document.getElementById('vikQuestion');
     const feelingsForm = document.getElementById('feelingsForm');
     const vikMsg = document.getElementById('vikMsg');
+    const bottomBlueGlow = document.getElementById('bottomBlueGlow');
 
     // Variables de intervalos de efectos de fondo
     let heartsInterval = null;
@@ -666,15 +697,22 @@
         return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value);
     }
 
+    // Capitalizar la primera letra del nombre ingresado
+    function capitalizeName(str) {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     // Lógica Centralizada de Entrada de Códigos
-    function processCodeInput(value) {
+    function processCodeInput(value, rawInputText) {
         if (isDavid(value)) {
             irAPaginaDavid();
             return true;
         }
 
         if (isVikVariant(value)) {
-            irAPaginaVik();
+            const formattedName = capitalizeName(rawInputText || value);
+            irAPaginaVik(formattedName);
             return true;
         }
 
@@ -721,9 +759,10 @@
     // Formulario Principal
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const value = input.value.trim().toLowerCase();
+        const rawText = input.value.trim();
+        const value = rawText.toLowerCase();
 
-        if (processCodeInput(value)) {
+        if (processCodeInput(value, rawText)) {
             input.value = '';
             return;
         }
@@ -780,8 +819,10 @@
     // Formulario en la pantalla final
     finalNameForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const value = finalNameInput.value.trim().toLowerCase();
-        if (!processCodeInput(value)) {
+        const rawText = finalNameInput.value.trim();
+        const value = rawText.toLowerCase();
+
+        if (!processCodeInput(value, rawText)) {
             msg.className = 'response-msg error';
             msg.textContent = 'Nombre o código no reconocido ;p';
         } else {
@@ -849,10 +890,14 @@
         davidPage.style.display = 'flex';
     }
 
-    function irAPaginaVik() {
+    function irAPaginaVik(nameEntered) {
         mainContainer.style.display = 'none';
         swapPage.style.display = 'none';
         davidPage.style.display = 'none';
+        
+        // Personaliza la pregunta con el nombre ingresado
+        vikQuestion.textContent = `¿Como te sientes realmente, ${nameEntered}?`;
+        
         vikPage.style.display = 'block';
         triggerFlash(vikPage);
     }
@@ -895,8 +940,10 @@
         });
     });
 
-    // Lógica de Corazones Azules Flotantes
+    // Lógica de Corazones Azules Flotantes y Resplandor Inferior
     function activarCorazonesAzules() {
+        bottomBlueGlow.style.display = 'block'; // Muestra el resplandor inferior
+
         if (heartsInterval !== null) return;
 
         const heartsContainer = document.getElementById('heartsContainer');
@@ -918,6 +965,8 @@
     }
 
     function desactivarCorazonesAzules() {
+        bottomBlueGlow.style.display = 'none'; // Oculta el resplandor inferior
+
         if (heartsInterval !== null) {
             clearInterval(heartsInterval);
             heartsInterval = null;
