@@ -14,7 +14,6 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            box-sizing: border-box;
         }
 
         /* Estilos Góticos con detalles Azul Neón */
@@ -408,7 +407,7 @@
             left: 0;
             width: 100vw;
             height: 220px;
-            background: linear-gradient(to top, rgba(37, 99, 235, 0.5) 0%, rgba(59, 130, 246, 0.15) 50%, transparent 100%);
+            background: linear-gradient(to top, rgba(37, 99, 235, 0.5) 0%, transparent 100%);
             pointer-events: none;
             z-index: 1;
             animation: glowPulse 3s ease-in-out infinite alternate;
@@ -420,8 +419,8 @@
                 height: 180px;
             }
             100% {
-                opacity: 0.95;
-                height: 260px;
+                opacity: 0.9;
+                height: 240px;
             }
         }
 
@@ -542,12 +541,14 @@
             max-width: 450px;
             width: 90%;
             z-index: 5;
-            transition: transform 3.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 2.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* Efecto de bajada de cámara */
-        .camera-down {
-            transform: translateY(120px) scale(0.95);
+        .calico-hint-text {
+            color: #60a5fa;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            text-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
         }
 
         /* PANTALLA NYX */
@@ -591,7 +592,7 @@
             }
         }
 
-        /* --- EFECTO DE LUZ BLANCA DE PANTALLA COMPLETA --- */
+        /* EFECTO DE DESTELLO BLANCO EN PANTALLA COMPLETA */
         #whiteFlashOverlay {
             position: fixed;
             top: 0;
@@ -601,87 +602,94 @@
             background-color: #ffffff;
             opacity: 0;
             pointer-events: none;
-            z-index: 999;
-            transition: opacity 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            transition: opacity 2s ease-out;
         }
 
         #whiteFlashOverlay.active {
             opacity: 1;
+            transition: opacity 0.3s ease-in;
         }
 
-        /* --- PÉTALOS / PARTICULAS AZULES EN DIAGONAL --- */
-        #petalsContainer {
+        /* CAPA DE ESTRELLAS SUPERIORES */
+        #starsContainer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 50vh;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .star-point {
+            position: absolute;
+            background-color: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #60a5fa, 0 0 10px #ffffff;
+            animation: starTwinkle infinite alternate ease-in-out;
+        }
+
+        @keyframes starTwinkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.3); }
+        }
+
+        /* CAPA DE PARTICULAS DIAGONALES DESDE ABAJO */
+        #diagonalParticlesContainer {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             pointer-events: none;
+            z-index: 1;
             overflow: hidden;
-            z-index: 4;
         }
 
-        .blue-petal {
+        .diagonal-particle {
             position: absolute;
-            background: linear-gradient(135deg, #60a5fa, #1d4ed8);
-            border-radius: 80% 0 80% 0; /* Forma estilo pétalo */
-            box-shadow: 0 0 10px #3b82f6, 0 0 20px #60a5fa;
-            opacity: 0;
-            animation: floatDiagonalPetal linear infinite;
+            bottom: -20px;
+            background-color: #60a5fa;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #3b82f6, 0 0 15px #60a5fa;
+            opacity: 0.8;
+            animation: moveDiagonal 4s linear infinite;
         }
 
-        @keyframes floatDiagonalPetal {
+        @keyframes moveDiagonal {
             0% {
+                transform: translate(0, 0) scale(0.6);
                 opacity: 0;
-                transform: translate(0, 0) rotate(0deg) scale(0.6);
             }
             20% {
                 opacity: 0.9;
             }
-            80% {
-                opacity: 0.8;
-            }
             100% {
+                transform: translate(120px, -105vh) scale(1.2);
                 opacity: 0;
-                transform: translate(-35vw, -110vh) rotate(360deg) scale(1.2);
             }
-        }
-
-        /* --- CAJA DE TEXTO ESTILO UNDERTALE DESPUÉS DEL EFECTO --- */
-        .undertale-textbox {
-            display: none;
-            background: #000000;
-            border: 4px solid #ffffff;
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 25px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
-            color: #ffffff;
-            line-height: 1.8;
-            text-align: left;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-            animation: fadeInBox 1.5s ease-out forwards;
-        }
-
-        @keyframes fadeInBox {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-<!-- Capa de brillo blanco de pantalla completa -->
+<!-- Destello blanco en toda la pantalla -->
 <div id="whiteFlashOverlay"></div>
 
-<!-- Contenedor para Pétalos/Partículas Azules -->
-<div id="petalsContainer"></div>
+<!-- Contenedor para las estrellas en la parte superior -->
+<div id="starsContainer"></div>
+
+<!-- Contenedor para las partículas diagonales -->
+<div id="diagonalParticlesContainer"></div>
 
 <!-- Contenedor para los corazones flotantes -->
 <div id="heartsContainer"></div>
 
-<!-- Resplandor azul inferior único -->
+<!-- Resplandor azul inferior -->
 <div id="bottomBlueGlow"></div>
 
 <!-- Contenedor para los brillitos de Nyx -->
@@ -690,10 +698,9 @@
 <!-- Contenedor para el efecto Krisselle / Noelle -->
 <div id="noelleContainer"></div>
 
-<!-- Pantalla de Sans (Sombra Secreta) -->
+<!-- Pantalla de Sans -->
 <div id="sansContainer">
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
-    
     <div id="sansBubble" class="speech-bubble">¿Cuál es tu versión favorita de mi?</div>
     <img id="sansSprite" src="sans.png" alt="sans">
     <div class="sans-text">¿Que estás buscando?</div>
@@ -751,14 +758,14 @@
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
 </div>
 
-<!-- Página para el código "David" -->
+<!-- Página David -->
 <div id="davidPage" onclick="location.reload();" title="Haz clic para volver">
     <svg class="shaking-heart-svg" viewBox="0 0 24 24">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
 </div>
 
-<!-- PANTALLA VIK -->
+<!-- Página Vik / Calico -->
 <div id="vikPage">
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
     
@@ -778,16 +785,14 @@
         <button type="button" class="btn-choice" onclick="sendPersonalChoice('No')">NO</button>
     </form>
 
-    <!-- Caja de Texto estilo Undertale revelada tras la transición del Sí -->
-    <div id="revealedTextbox" class="undertale-textbox">
-        * Gracias por confiar.<br><br>
-        * A partir de ahora entramos en la fase profunda...
+    <div id="calicoHint" class="calico-hint-text" style="display: none;">
+        # Para volver ingresa <span class="highlight-blue">Calico</span>
     </div>
 
     <div id="vikMsg" class="response-msg"></div>
 </div>
 
-<!-- PÁGINA: Código "Nyx" -->
+<!-- PÁGINA: Nyx -->
 <div id="nyxPage">
     <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
     <img src="nyx.png" alt="Nyx" class="clue-image" style="max-height: 250px;">
@@ -811,7 +816,7 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
-    // Interacción al hacer clic a Sans
+    // Interacción con Sans
     const sansSprite = document.getElementById('sansSprite');
     const sansBubble = document.getElementById('sansBubble');
 
@@ -854,12 +859,13 @@
     const personalChoiceInput = document.getElementById('personalChoiceInput');
     const vikMsg = document.getElementById('vikMsg');
     const bottomBlueGlow = document.getElementById('bottomBlueGlow');
+    const calicoHint = document.getElementById('calicoHint');
     const whiteFlashOverlay = document.getElementById('whiteFlashOverlay');
-    const revealedTextbox = document.getElementById('revealedTextbox');
+    const starsContainer = document.getElementById('starsContainer');
+    const diagonalParticlesContainer = document.getElementById('diagonalParticlesContainer');
 
     let heartsInterval = null;
     let sparklesInterval = null;
-    let petalsInterval = null;
     let stage = 1;
 
     function triggerFlash(element) {
@@ -875,6 +881,7 @@
 
     function isDavid(value) { return value === 'david'; }
     function isVikVariant(value) { return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value); }
+    function isCalico(value) { return value === 'calico'; }
     function isNyx(value) { return value === 'nyx'; }
 
     function capitalizeName(str) {
@@ -882,14 +889,28 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
+    // Lógica de Códigos
     function processCodeInput(value, rawInputText) {
-        if (isDavid(value)) { irAPaginaDavid(); return true; }
+        if (isDavid(value)) {
+            irAPaginaDavid();
+            return true;
+        }
+
         if (isVikVariant(value)) {
             const formattedName = capitalizeName(rawInputText || value);
             irAPaginaVik(formattedName);
             return true;
         }
-        if (isNyx(value)) { irAPaginaNyx(); return true; }
+
+        if (isCalico(value)) {
+            irAPaginaCalico();
+            return true;
+        }
+
+        if (isNyx(value)) {
+            irAPaginaNyx();
+            return true;
+        }
 
         if (isWhyVariant(value)) {
             whyResponseBox.style.display = 'block';
@@ -916,8 +937,15 @@
             return true;
         }
 
-        if (value === 'killer' || value === 'killer sans') { irAFaseKiller(); return true; }
-        if (value === 'swap' || value === 'swap sans') { irAPaginaSwap(); return true; }
+        if (value === 'killer' || value === 'killer sans') {
+            irAFaseKiller();
+            return true;
+        }
+
+        if (value === 'swap' || value === 'swap sans') {
+            irAPaginaSwap();
+            return true;
+        }
 
         return false;
     }
@@ -939,25 +967,45 @@
                 triggerFlash(promptText);
                 input.value = '';
                 msg.textContent = '';
-            } else if (value === 'porcelana') { irAFaseVideoRoberto(); }
-            else if (value === 'roberto') { irAFasePreguntaRoberto(); }
-            else if (value === 'kiki') { mostrarInstruccionDiscord(); }
-            else { mostrarError(); }
+            } else if (value === 'porcelana') {
+                irAFaseVideoRoberto();
+            } else if (value === 'roberto') {
+                irAFasePreguntaRoberto();
+            } else if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
+            }
         } else if (stage === 2) {
-            if (value === 'porcelana') { irAFaseVideoRoberto(); }
-            else if (value === 'roberto') { irAFasePreguntaRoberto(); }
-            else if (value === 'kiki') { mostrarInstruccionDiscord(); }
-            else { mostrarError(); }
+            if (value === 'porcelana') {
+                irAFaseVideoRoberto();
+            } else if (value === 'roberto') {
+                irAFasePreguntaRoberto();
+            } else if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
+            }
         } else if (stage === 'video_roberto') {
-            if (value === 'roberto') { irAFasePreguntaRoberto(); }
-            else if (value === 'kiki') { mostrarInstruccionDiscord(); }
-            else { mostrarError(); }
+            if (value === 'roberto') {
+                irAFasePreguntaRoberto();
+            } else if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
+            }
         } else if (stage === 'pregunta_roberto') {
-            if (value === 'kiki') { mostrarInstruccionDiscord(); }
-            else { mostrarError(); }
+            if (value === 'kiki') {
+                mostrarInstruccionDiscord();
+            } else {
+                mostrarError();
+            }
         } else if (stage === 'killer') {
-            if (value === 'swap' || value === 'swap sans') { irAPaginaSwap(); }
-            else { mostrarError(); }
+            if (value === 'swap' || value === 'swap sans') {
+                irAPaginaSwap();
+            } else {
+                mostrarError();
+            }
         }
     });
 
@@ -1043,10 +1091,25 @@
         vikQuestion.textContent = `¿Como te sientes realmente, ${nameEntered}?`;
         feelingsForm.style.display = 'block';
         personalChoiceForm.style.display = 'none';
-        revealedTextbox.style.display = 'none';
-        vikPage.classList.remove('camera-down');
+        calicoHint.style.display = 'none';
         vikMsg.textContent = '';
         
+        vikPage.style.display = 'block';
+        triggerFlash(vikPage);
+    }
+
+    function irAPaginaCalico() {
+        mainContainer.style.display = 'none';
+        swapPage.style.display = 'none';
+        davidPage.style.display = 'none';
+        nyxPage.style.display = 'none';
+
+        feelingsForm.style.display = 'none';
+        vikQuestion.textContent = '¿Aceptas que a partir de este punto las cosas se hagan mas personales?';
+        personalChoiceForm.style.display = 'block';
+        calicoHint.style.display = 'block';
+        vikMsg.textContent = '';
+
         vikPage.style.display = 'block';
         triggerFlash(vikPage);
     }
@@ -1074,7 +1137,7 @@
         start24HourTimer();
     }
 
-    // Envío del Formulario de Sentimientos
+    // Envío del Formulario de Sentimientos por Correo
     feelingsForm.addEventListener('submit', function(e) {
         e.preventDefault();
         vikMsg.className = 'response-msg success';
@@ -1088,9 +1151,11 @@
             if (response.ok) {
                 feelingsForm.style.display = 'none';
                 vikMsg.textContent = '';
+                
                 vikQuestion.textContent = '¿Aceptas que a partir de este punto las cosas se hagan mas personales?';
                 triggerFlash(vikQuestion);
                 personalChoiceForm.style.display = 'block';
+                calicoHint.style.display = 'block';
             } else {
                 vikMsg.className = 'response-msg error';
                 vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
@@ -1101,80 +1166,111 @@
         });
     });
 
-    // Envío de la Elección Personal (Sí / No) con la Cinemática Especial
+    // Envío de la Elección Personal (Sí / No) con Secuencia Visual
     function sendPersonalChoice(choice) {
         personalChoiceInput.value = choice;
-        
-        if (choice === 'Sí') {
-            // 1. Iniciar la luz blanca cubriendo toda la pantalla
-            whiteFlashOverlay.classList.add('active');
+        vikMsg.className = 'response-msg success';
+        vikMsg.textContent = 'Registrando respuesta...';
 
-            setTimeout(() => {
-                // Ocultar la pregunta y botones durante la ceguera blanca
-                personalChoiceForm.style.display = 'none';
-                vikQuestion.style.display = 'none';
-                
-                // 2. Desvanecer la luz blanca poco a poco
-                whiteFlashOverlay.classList.remove('active');
-
-                // 3. Iniciar el descenso lento de la cámara
-                vikPage.classList.add('camera-down');
-
-                // 4. Activar el resplandor azul inferior
-                bottomBlueGlow.style.display = 'block';
-
-                // 5. Iniciar la lluvia en diagonal de pétalos/partículas azules
-                activarPetalosAzules();
-
-                // 6. Hacer aparecer la caja de texto tras el descenso
-                setTimeout(() => {
-                    revealedTextbox.style.display = 'block';
-                }, 1800);
-
-            }, 2500);
-
-        } else {
-            vikMsg.className = 'response-msg success';
-            vikMsg.textContent = 'Entendido. No avanzaremos más allá.';
-            personalChoiceForm.style.display = 'none';
-        }
-
-        // Enviar notificación a Formspree de fondo
         fetch(personalChoiceForm.action, {
             method: 'POST',
             body: new FormData(personalChoiceForm),
             headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                if (choice === 'Sí') {
+                    iniciarAnimacionMisticaAceptacion();
+                } else {
+                    personalChoiceForm.style.display = 'none';
+                    calicoHint.style.display = 'none';
+                    vikMsg.className = 'response-msg success';
+                    vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
+                }
+            } else {
+                vikMsg.className = 'response-msg error';
+                vikMsg.textContent = 'Error al enviar. Inténtalo de nuevo.';
+            }
+        }).catch(() => {
+            vikMsg.className = 'response-msg error';
+            vikMsg.textContent = 'Error de conexión.';
         });
     }
 
-    // Lógica de Pétalos / Partículas Azules en Diagonal desde Abajo
-    function activarPetalosAzules() {
-        if (petalsInterval !== null) return;
+    // Animación Mística al aceptar "SÍ"
+    function iniciarAnimacionMisticaAceptacion() {
+        // 1. Efecto de brillo blanco que cubre la pantalla
+        whiteFlashOverlay.classList.add('active');
 
-        const petalsContainer = document.getElementById('petalsContainer');
+        setTimeout(() => {
+            // Desvanecer el brillo blanco
+            whiteFlashOverlay.classList.remove('active');
 
-        petalsInterval = setInterval(() => {
-            const petal = document.createElement('div');
-            petal.classList.add('blue-petal');
+            // Ocultar formulario de botones
+            personalChoiceForm.style.display = 'none';
+            calicoHint.style.display = 'none';
+            vikMsg.className = 'response-msg success';
+            vikMsg.textContent = 'Respuesta guardada. Gracias. 💙';
 
-            const width = Math.random() * 12 + 8;
-            const height = width * (Math.random() * 0.5 + 1.2);
-            
-            petal.style.width = width + 'px';
-            petal.style.height = height + 'px';
-            petal.style.right = (Math.random() * 60 - 10) + 'vw';
-            petal.style.bottom = '-40px';
-            petal.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            // 2. La cámara (el recuadro) baja lentamente
+            vikPage.style.transform = 'translateY(120px)';
 
-            petalsContainer.appendChild(petal);
+            // 3. Activar brillo azul desde abajo
+            bottomBlueGlow.style.display = 'block';
 
-            setTimeout(() => {
-                petal.remove();
-            }, 7000);
-        }, 300);
+            // 4. Generar estrellas arriba
+            generarEstrellasSuperiores();
+
+            // 5. Generar partículas en diagonal desde abajo
+            generarParticulasDiagonales();
+
+        }, 500);
     }
 
-    // Lógica de Brillitos Vectoriales para Nyx
+    // Generador de Estrellas Superiores
+    function generarEstrellasSuperiores() {
+        starsContainer.style.display = 'block';
+        starsContainer.innerHTML = '';
+
+        for (let i = 0; i < 40; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star-point');
+            
+            const size = Math.random() * 3 + 2;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 45 + 'vh';
+            star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+            star.style.animationDelay = (Math.random() * 2) + 's';
+
+            starsContainer.appendChild(star);
+        }
+    }
+
+    // Generador de Partículas Diagonales
+    function generarParticulasDiagonales() {
+        diagonalParticlesContainer.style.display = 'block';
+        diagonalParticlesContainer.innerHTML = '';
+
+        setInterval(() => {
+            const particle = document.createElement('div');
+            particle.classList.add('diagonal-particle');
+
+            const size = Math.random() * 6 + 4;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 90 + 'vw';
+            particle.style.animationDuration = (Math.random() * 2.5 + 3) + 's';
+
+            diagonalParticlesContainer.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 6000);
+        }, 200);
+    }
+
+    // Lógica de Brillitos Vectoriales (SVG) para Nyx
     function activarBrillitosNyx() {
         if (sparklesInterval !== null) return;
         const sparklesContainer = document.getElementById('sparklesContainer');
@@ -1200,7 +1296,7 @@
         }, 250);
     }
 
-    // Lógica de Corazones Azules Flotantes
+    // Corazones Azules Flotantes
     function activarCorazonesAzules() {
         bottomBlueGlow.style.display = 'block';
         if (heartsInterval !== null) return;
@@ -1215,6 +1311,7 @@
             heart.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
             
             heartsContainer.appendChild(heart);
+
             setTimeout(() => { heart.remove(); }, 7000);
         }, 400);
     }
@@ -1228,7 +1325,7 @@
         document.getElementById('heartsContainer').innerHTML = '';
     }
 
-    // Lógica del Efecto "Krisselle"
+    // Efecto Noelle
     function activarEfectoNoelle() {
         const noelleContainer = document.getElementById('noelleContainer');
         noelleContainer.innerHTML = '';
@@ -1258,10 +1355,9 @@
         noelleContainer.innerHTML = '';
     }
 
-    // Temporizador
+    // Temporizador de 24 horas
     function start24HourTimer() {
         let startTime = localStorage.getItem('arg_timer_start');
-        
         if (!startTime) {
             startTime = Date.now();
             localStorage.setItem('arg_timer_start', startTime);
