@@ -602,6 +602,9 @@
 
 <!-- Pantalla de Sans (Sombra Secreta) -->
 <div id="sansContainer">
+    <!-- Botón de recarga en la página de Sans -->
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
+    
     <div id="sansBubble" class="speech-bubble">¿Cuál es tu versión favorita de mi?</div>
     <img id="sansSprite" src="sans.png" alt="sans">
     <div class="sans-text">¿Que estás buscando?</div>
@@ -718,12 +721,20 @@
         localStorage.setItem('arg_reload_count', reloadCount);
     }
 
-    // Interacción al hacer clic/tocar a Sans
+    // Interacción al hacer clic/tocar a Sans (con probabilidad de preguntar por un abrazo)
     const sansSprite = document.getElementById('sansSprite');
     const sansBubble = document.getElementById('sansBubble');
 
     if (sansSprite) {
         sansSprite.addEventListener('click', function() {
+            // Genera un número entre 0 y 1 (50% de probabilidad para la pregunta del abrazo)
+            const isHugQuestion = Math.random() < 0.5;
+
+            if (isHugQuestion) {
+                sansBubble.innerHTML = '¿Quieres un <span class="highlight-blue">abrazo</span>?';
+            } else {
+                sansBubble.innerHTML = '¿Cuál es tu versión favorita de mi?';
+            }
             sansBubble.style.display = 'block';
         });
     }
@@ -1091,12 +1102,11 @@
             sparkle.setAttribute('class', 'nyx-sparkle-svg');
             sparkle.setAttribute('viewBox', '0 0 24 24');
 
-            // SVG de estrella/destello de 4 puntas
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', 'M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z');
             sparkle.appendChild(path);
 
-            const randomSize = Math.random() * 18 + 14; // Tamaños variados
+            const randomSize = Math.random() * 18 + 14;
             sparkle.style.width = randomSize + 'px';
             sparkle.style.height = randomSize + 'px';
             sparkle.style.left = Math.random() * 90 + 5 + 'vw';
