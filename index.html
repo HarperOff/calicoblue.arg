@@ -482,6 +482,27 @@
             100% { box-shadow: 0 0 45px rgba(96, 165, 250, 0.8), inset 0 0 30px rgba(59, 130, 246, 0.5); }
         }
 
+        /* PANTALLA RALSEI */
+        #ralseiPage {
+            display: none;
+            position: relative;
+            text-align: center;
+            background: #0a0d14;
+            padding: 40px 25px;
+            border: 2px solid #22c55e;
+            border-radius: 12px;
+            box-shadow: 0 0 35px rgba(34, 197, 94, 0.5), inset 0 0 25px rgba(34, 197, 94, 0.2);
+            max-width: 450px;
+            width: 90%;
+            z-index: 5;
+            animation: greenGlowPage 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes greenGlowPage {
+            0% { box-shadow: 0 0 25px rgba(34, 197, 94, 0.4), inset 0 0 15px rgba(34, 197, 94, 0.2); }
+            100% { box-shadow: 0 0 45px rgba(74, 222, 128, 0.7), inset 0 0 30px rgba(34, 197, 94, 0.4); }
+        }
+
         /* PANTALLA DAVID */
         #davidPage {
             display: none;
@@ -739,11 +760,22 @@
 
 <!-- Página para Swap Sans -->
 <div id="swapPage">
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
     <img src="swap.png" alt="Swap y Killer Sans" class="clue-image">
     <p style="color: #60a5fa; font-size: 1.1rem; line-height: 1.6; text-shadow: 0 0 10px rgba(96, 165, 250, 0.6); margin-bottom: 25px;">
         Así es! Arriba el KillSwap!
     </p>
     <button type="button" onclick="location.reload();">VOLVER AL INICIO</button>
+</div>
+
+<!-- Página para Ralsei -->
+<div id="ralseiPage">
+    <button type="button" class="reload-icon-btn" onclick="location.reload();" title="Recargar página">🔄</button>
+    <img src="ralsei.gif" alt="Ralsei" class="clue-image" style="image-rendering: pixelated; max-height: 240px; cursor: pointer;" onclick="location.reload();">
+    <p style="color: #4ade80; font-size: 1.1rem; line-height: 1.6; text-shadow: 0 0 10px rgba(74, 222, 128, 0.6); margin-top: 10px; margin-bottom: 20px;">
+        * Ralsei te saluda tranquilamente... *
+    </p>
+    <button type="button" onclick="location.reload();" style="background-color: #15803d;">VOLVER AL INICIO</button>
 </div>
 
 <!-- Página David -->
@@ -838,6 +870,7 @@
     const timerDisplay = document.getElementById('timer');
     const mainContainer = document.getElementById('mainContainer');
     const swapPage = document.getElementById('swapPage');
+    const ralseiPage = document.getElementById('ralseiPage');
     const davidPage = document.getElementById('davidPage');
     const vikPage = document.getElementById('vikPage');
     const nyxPage = document.getElementById('nyxPage');
@@ -873,6 +906,7 @@
     function isVikVariant(value) { return ['vik', 'viktor', 'viktoria', 'victoria'].includes(value); }
     function isCalico(value) { return value === 'calico'; }
     function isNyx(value) { return value === 'nyx'; }
+    function isRalsei(value) { return value === 'ralsei'; }
 
     function capitalizeName(str) {
         if (!str) return '';
@@ -908,6 +942,11 @@
 
         if (isNyx(value)) {
             irAPaginaNyx();
+            return true;
+        }
+
+        if (isRalsei(value)) {
+            irAPaginaRalsei();
             return true;
         }
 
@@ -1070,8 +1109,20 @@
         vikPage.style.display = 'none';
         davidPage.style.display = 'none';
         nyxPage.style.display = 'none';
+        ralseiPage.style.display = 'none';
         swapPage.style.display = 'block';
         triggerFlash(swapPage);
+    }
+
+    function irAPaginaRalsei() {
+        limpiarEfectosFondo();
+        mainContainer.style.display = 'none';
+        vikPage.style.display = 'none';
+        davidPage.style.display = 'none';
+        nyxPage.style.display = 'none';
+        swapPage.style.display = 'none';
+        ralseiPage.style.display = 'block';
+        triggerFlash(ralseiPage);
     }
 
     function irAPaginaDavid() {
@@ -1080,6 +1131,7 @@
         swapPage.style.display = 'none';
         vikPage.style.display = 'none';
         nyxPage.style.display = 'none';
+        ralseiPage.style.display = 'none';
         davidPage.style.display = 'flex';
     }
 
@@ -1089,6 +1141,7 @@
         swapPage.style.display = 'none';
         davidPage.style.display = 'none';
         nyxPage.style.display = 'none';
+        ralseiPage.style.display = 'none';
         
         vikQuestion.textContent = `¿Como te sientes realmente, ${nameEntered}?`;
         feelingsForm.style.display = 'block';
@@ -1106,9 +1159,10 @@
         swapPage.style.display = 'none';
         davidPage.style.display = 'none';
         nyxPage.style.display = 'none';
+        ralseiPage.style.display = 'none';
 
         feelingsForm.style.display = 'none';
-        vikQuestion.textContent = '¿Aceptas que a partir de este punto las cosas se hagan mas personales?';
+        vikQuestion.textContent = 'Entonces continuaremos mas adelante ;)';
         personalChoiceForm.style.display = 'block';
         calicoHint.style.display = 'block';
         vikMsg.textContent = '';
@@ -1123,6 +1177,7 @@
         swapPage.style.display = 'none';
         davidPage.style.display = 'none';
         vikPage.style.display = 'none';
+        ralseiPage.style.display = 'none';
         nyxPage.style.display = 'block';
         triggerFlash(nyxPage);
         activarBrillitosNyx();
