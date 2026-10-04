@@ -183,23 +183,9 @@
             overflow-y: auto;
         }
 
-        .confession-box {
-            max-width: 650px;
-            text-align: left;
-            background: rgba(10, 13, 20, 0.85);
-            padding: 30px;
-            border: 1px solid #1e3a8a;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(30, 144, 255, 0.3);
-            margin-bottom: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centrar la imagen dentro de la caja si se desea */
-        }
-
-        /* Estilo de la imagen añadida dentro de la caja */
+        /* Estilo de la imagen añadida arriba */
         .confession-image {
-            max-width: 280px;
+            max-width: 320px;
             width: 100%;
             height: auto;
             border-radius: 6px;
@@ -232,6 +218,17 @@
             100% { filter: drop-shadow(0 0 25px #60a5fa) drop-shadow(0 0 45px #3b82f6); }
         }
 
+        .confession-box {
+            max-width: 650px;
+            text-align: left;
+            background: rgba(10, 13, 20, 0.85);
+            padding: 30px;
+            border: 1px solid #1e3a8a;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(30, 144, 255, 0.3);
+            margin-bottom: 40px;
+        }
+
         .confession-box p {
             color: #93c5fd;
             font-size: 0.95rem;
@@ -247,7 +244,6 @@
             text-align: right;
             font-size: 1.1rem;
             text-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
-            width: 100%;
         }
 
         #diagonalParticlesContainer {
@@ -303,15 +299,15 @@
 </div>
 
 <div id="davidPage">
-    <div class="confession-box">
-        <!-- Imagen movida a la parte superior dentro de la caja -->
-        <img src="IMG_20260921_224312_500.jpg" alt="Dibujo especial" class="confession-image">
+    <!-- El corazón temblando y la imagen fuera de la caja, ordenados arriba -->
+    <svg class="shaking-heart-svg" viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
 
-        <svg class="shaking-heart-svg" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
-        
-        <p># Hola! Las cosas parece que no salieron como yo esperaba... todo esto tenía una intención. Obviamente la página no te diría todo completo... pero ya no creo poder seguir con el plan original. Desde que te conocí vi algo en ti que no había visto en nadie mas a mi alrededor, algo que me llamaba muchísimo la atención. Quizá era tu aspecto o tu personalidad a primera vista. A ciencia cierta no lo sé. El asunto es... gracias a ti descubrí cosas nuevas. Me refiero a cosas que no había sentido pensado de mi mismo o de alguien mas, cosas buenas y malas. También pude conocerte un poco, ver mas de eso que me llamaba la atención... entre mas sabía de ti, mas parecías gustarme, mas quería decir lo que sentía. Pero me daba miedo. Me daba miedo tu rechazo, miedo que decidieras alejarte de mi o que me vieras como a otros que te han dicho lo mismo. No me malentiendas. Esto no significa que me vaya a alejar de ti o vaya a dejar de ser como soy contigo, he sido genuino contigo en mi forma de ser, eso no va a cambiar, lo unico que llegué a ocultarte fue lo que siento. Porque ese es el asunto... aún siento eso, no sé como podría cambiar lo que veo en ti. Lo que siento cuando te veo, te escucho, o simplemente me hablas por chat. Me gustas mas allá de lo tradicional, o al menos eso pienso yo... nunca vi nada malo en ti. Ni siquiera en las cosas que dijiste que ningún hombre aceptaría de ti. Yo hubiera estado mas que feliz de despertar cada dia y saber si hoy pasaría un dia hablando con Viktor o con Viktoria, amo esas dos partes de ti. Y amo todas las demás. Porque todo en ti siempre me ha gustado. Sin excepciones. Quizá pienses que es raro o una tontería que me gustes de esta forma en tan poco tiempo. Quizá no pienses eso. No sé si obtendré una respuesta positiva a esto... ni siquiera sé cuando verás esto. but... si en algún momento existiera la posibilidad... ¿me darías una oportunidad? Ojalá sea una respuesta positiva... ojalá.</p>
+    <img src="IMG_20260921_224312_500.jpg" alt="Dibujo especial" class="confession-image">
+    
+    <div class="confession-box">
+        <p># Hola! Las cosas parece que no salieron como yo esperaba... todo esto tenía una intención. Obviamente la página no te diría todo completo... pero ya no creo poder seguir con el plan original. Desde que te conocí vi algo en ti que no había visto en nadie mas a mi alrededor, algo que me llamaba muchísimo la atención. Quizá era tu aspecto o tu personalidad a primera vista. A ciencia cierta no lo sé. El asunto es... gracias a ti descubrí cosas nuevas. Me refiero a cosas que no había sentido pensado de mi mismo o de alguien mas, cosas buenas y malas. También pude conocerte un poco, ver mas de eso que me llamaba la atención... entre mas sabía de ti, mas parecías gustarme, mas quería decir lo que sentía. Pero me daba miedo. Me daba miedo tu rechazo, miedo que decidieras alejarte de mi o que me vieras como a otros que te han dicho lo mismo. No me malentiendas. Esto no significa que me vaya a alejar de ti o vaya a dejar de ser como soy contigo, he sido genuino contigo en mi forma de ser, eso no va a cambiar, lo unico que llegué a ocultarte fue lo que siento. Porque ese es el asunto... aún siento eso, no sé como podría cambiar lo que veo en ti. Lo que siento cuando te veo, te escucho, o simplemente me hablas por chat. Me gustas mas allá de lo tradicional, o al menos eso pienso yo... nunca vi nada malo en ti. Ni siquiera en las cosas que dijiste que ningún hombre aceptaría de ti. Yo hubiera estado mas que feliz de despertar cada dia y saber si hoy pasaría un dia hablando con Viktor o con Viktoria, amo esas dos partes de ti. Y amo todas las demás. Porque todo en ti siempre me ha gustado. Sin excepciones. Quizá pienses que es raro o una tontería que me gustes de esta forma en tan poco tiempo. Quizá no pienses eso. No sé si obtendré una respuesta positiva a esto... ni siquiera sé cuando verás esto. pero... si en algún momento existiera la posibilidad... ¿me darías una oportunidad? Ojalá sea una respuesta positiva... ojalá.</p>
         
         <p>Lo digo de nuevo: esto no significa que vaya a alejarme de ti o a cambiar como soy contigo, estoy muy feliz por ti. Lo que siento no cambiará</p>
         
