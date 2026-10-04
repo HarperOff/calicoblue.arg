@@ -16,7 +16,6 @@
             -ms-user-select: none;
         }
 
-        /* Estilos Góticos con detalles Azul Neón */
         body {
             background-color: #050508;
             color: #d1e8ff;
@@ -52,7 +51,6 @@
             margin-bottom: 20px;
         }
 
-        /* Palabra AZUL destacada en el título */
         .highlight-blue {
             color: #60a5fa;
             font-weight: bold;
@@ -78,7 +76,6 @@
             line-height: 1.5;
         }
 
-        /* Animación de destello para los textos al cambiar */
         .flash-effect {
             animation: textFlash 0.8s ease-out;
         }
@@ -151,7 +148,6 @@
 
         .error { color: #f87171; }
 
-        /* Resplandor azul único desde la parte inferior */
         #bottomBlueGlow {
             position: fixed;
             bottom: 0;
@@ -169,7 +165,7 @@
             100% { opacity: 0.9; height: 240px; }
         }
 
-        /* PANTALLA DAVID / RESPUESTA */
+        /* PÁGINA DAVID / RESPUESTA */
         #davidPage {
             display: none;
             position: absolute;
@@ -185,6 +181,17 @@
             padding: 40px 20px;
             box-sizing: border-box;
             overflow-y: auto;
+        }
+
+        /* Estilo de la imagen añadida arriba */
+        .confession-image {
+            max-width: 320px;
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #1e3a8a;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            margin-bottom: 25px;
         }
 
         .shaking-heart-svg {
@@ -239,7 +246,6 @@
             text-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
         }
 
-        /* CAPA DE PARTICULAS DIAGONALES DESDE ABAJO */
         #diagonalParticlesContainer {
             position: fixed;
             top: 0;
@@ -276,18 +282,14 @@
 </head>
 <body>
 
-<!-- Efectos de fondo permanentes (Brillo y Partículas) -->
 <div id="diagonalParticlesContainer"></div>
 <div id="bottomBlueGlow"></div>
 
-<!-- Contenedor Principal del Juego -->
 <div class="container" id="mainContainer">
     <h1>[ PROYECTO: CÁLICO_<span class="highlight-blue">AZUL</span> ]</h1>
 
-    <!-- Formulario de Código Único -->
     <form id="codeForm">
-        <p id="promptText"># Busca la <span class="highlight-blue">respuesta</span></p>
-
+        <p># Busca la <span class="highlight-blue">respuesta</span></p>
         <input type="text" id="userInput" placeholder="Escribe tu respuesta..." autocomplete="off">
         <br>
         <button type="submit">INGRESAR</button>
@@ -296,8 +298,10 @@
     <div id="responseMsg" class="response-msg"></div>
 </div>
 
-<!-- Página David / Respuesta -->
 <div id="davidPage">
+    <!-- Imagen agregada en la parte superior -->
+    <img src="IMG_20260921_224312_500.jpg" alt="Dibujo especial" class="confession-image">
+
     <svg class="shaking-heart-svg" viewBox="0 0 24 24">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
@@ -312,7 +316,6 @@
 </div>
 
 <script>
-    // Elementos DOM
     const codeForm = document.getElementById('codeForm');
     const input = document.getElementById('userInput');
     const msg = document.getElementById('responseMsg');
@@ -325,7 +328,6 @@
         element.classList.add('flash-effect');
     }
 
-    // Generar partículas diagonales flotantes
     function generarParticulasDiagonales() {
         const diagonalParticlesContainer = document.getElementById('diagonalParticlesContainer');
         if (!diagonalParticlesContainer) return;
@@ -348,7 +350,6 @@
 
     generarParticulasDiagonales();
 
-    // Procesamiento del formulario de código único
     codeForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const rawText = input.value.trim();
